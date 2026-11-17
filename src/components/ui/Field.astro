@@ -1,0 +1,52 @@
+---
+/** Labelled form field: text input, email, select or textarea. Pill-shaped like indigitous.org. */
+interface Props {
+  label: string;
+  name: string;
+  as?: 'input' | 'select' | 'textarea';
+  type?: 'text' | 'email' | 'tel' | 'url';
+  placeholder?: string;
+  required?: boolean;
+  options?: string[];
+  hint?: string;
+  tone?: 'light' | 'dark';
+  class?: string;
+}
+const {
+  label,
+  name,
+  as = 'input',
+  type = 'text',
+  placeholder,
+  required = false,
+  options = [],
+  hint,
+  tone = 'light',
+  class: className,
+} = Astro.props;
+const id = `f-${name}`;
+const control = [
+  'w-full px-6 py-3.5 text-base outline-none transition focus:ring-2',
+  tone === 'light'
+    ? 'bg-mist text-ink placeholder:text-muted focus:ring-brand-orange'
+    : 'border border-white/70 bg-transparent text-white placeholder:text-white/70 focus:ring-white',
+  as === 'textarea' ? 'rounded-tile min-h-36' : 'rounded-pill',
+];
+---
+
+<div class:list={['flex flex-col gap-2', className]}>
+  <label for={id} class:list={['eyebrow', tone === 'dark' ? 'text-white' : 'text-ink']}>
+    {label}
+    {required && <span aria-hidden="true"> *</span>}
+  </label>
+  {as === 'input' && <input id={id} {name} {type} {placeholder} {required} class:list={control} />}
+  {as === 'select' && (
+    <select id={id} {name} {required} class:list={[control, 'appearance-none']}>
+      {options.map((o) => (
+        <option value={o}>{o}</option>
+      ))}
+    </select>
+  )}
+  {as === 'textarea' && <textarea id={id} {name} {placeholder} {required} class:list={control} />}
+  {hint && <p class:list={['text-sm', tone === 'dark' ? 'text-white/80' : 'text-muted']}>{hint}</p>}
+</div>

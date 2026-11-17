@@ -1,0 +1,28 @@
+---
+/** Small rounded label: roles, categories, filters. */
+interface Props {
+  tone?: 'yellow' | 'orange' | 'ink' | 'mist' | 'outline';
+  size?: 'sm' | 'md';
+  class?: string;
+}
+const { tone = 'yellow', size = 'md', class: className } = Astro.props;
+const tones = {
+  yellow: 'bg-brand-yellow text-ink',
+  orange: 'bg-brand-orange-dark text-white',
+  ink: 'bg-ink text-white',
+  mist: 'bg-mist text-ink',
+  outline: 'border border-ink/30 text-ink',
+};
+const sizes = { sm: 'px-3 py-1 text-xs', md: 'px-4 py-1.5 text-sm' };
+---
+
+<span
+  class:list={[
+    'inline-flex w-max items-center gap-1 rounded-pill font-medium whitespace-nowrap',
+    tones[tone],
+    sizes[size],
+    className,
+  ]}
+>
+  <slot />
+</span>

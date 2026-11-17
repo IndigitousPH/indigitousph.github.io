@@ -1,0 +1,302 @@
+---
+/**
+ * Component showcase. Every `src/components/**\/*.stories.ts` file is picked up automatically.
+ * Brand token values are read from the live CSS variables, so they always match global.css.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Logo from '@/components/ui/Logo.astro';
+import type { Story } from '@/lib/story';
+
+const modules = import.meta.glob<{ default: Story }>('../../components/**/*.stories.ts', {
+  eager: true,
+});
+
+const categoryOrder = ['ui', 'cards', 'sections', 'layout'];
+const categoryLabel: Record<string, string> = {
+  ui: 'UI',
+  cards: 'Cards',
+  sections: 'Sections',
+  layout: 'Layout',
+};
+
+const stories = Object.entries(modules)
+  .map(([path, mod]) => {
+    const category = path.split('/').at(-2) ?? 'other';
+    const file = path.replace('../../', 'src/').replace('.stories.ts', '.astro');
+    return { ...mod.default, category, file, id: `c-${mod.default.title.toLowerCase()}` };
+  })
+  .sort(
+    (a, b) =>
+      categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category) ||
+      a.title.localeCompare(b.title),
+  );
+
+const grouped = categoryOrder
+  .map((cat) => ({ cat, items: stories.filter((s) => s.category === cat) }))
+  .filter((g) => g.items.length);
+
+const fmt = (v: unknown): string => {
+  if (v instanceof Date) return `{new Date('${v.toISOString()}')}`;
+  if (typeof v === 'string') return `"${v}"`;
+  return `{${JSON.stringify(v)}}`;
+};
+const toCode = (title: string, props: Record<string, unknown> = {}, slot?: string) => {
+  const attrs = Object.entries(props).map(([k, v]) => (v === true ? k : `${k}=${fmt(v)}`));
+  const open =
+    attrs.join(' ').length > 60
+      ? `<${title}\n  ${attrs.join('\n  ')}\n`
+      : `<${title}${attrs.length ? ' ' + attrs.join(' ') : ''}`;
+  return slot ? `${open}>${slot}</${title}>` : `${open} />`;
+};
+const widths = { sm: 'max-w-sm', md: 'max-w-2xl', full: 'w-full' };
+
+const colors = [
+  { name: 'brand-orange', use: 'Brand, accents, gradients' },
+  { name: 'brand-orange-dark', use: 'Buttons & links (AA on white)' },
+  { name: 'brand-yellow', use: 'Highlights, pill tags' },
+  { name: 'brand-pink', use: 'Small accents only' },
+  { name: 'ink', use: 'Text, dark surfaces' },
+  { name: 'ink-2', use: 'Secondary dark surface' },
+  { name: 'muted', use: 'Secondary text' },
+  { name: 'stone', use: 'Borders' },
+  { name: 'mist', use: 'Light surfaces' },
+  { name: 'paper', use: 'Page background' },
+];
+const swatchClass: Record<string, string> = {
+  'brand-orange': 'bg-brand-orange',
+  'brand-orange-dark': 'bg-brand-orange-dark',
+  'brand-yellow': 'bg-brand-yellow',
+  'brand-pink': 'bg-brand-pink',
+  ink: 'bg-ink',
+  'ink-2': 'bg-ink-2',
+  muted: 'bg-muted',
+  stone: 'bg-stone',
+  mist: 'bg-mist',
+  paper: 'bg-paper',
+};
+const radii = [
+  { name: 'pill', cls: 'rounded-pill', note: '40px · buttons, inputs, tags' },
+  { name: 'card', cls: 'rounded-card', note: '32px · cards, bands' },
+  { name: 'tile', cls: 'rounded-tile', note: '24px · small tiles, textareas' },
+];
+---
+
+<BaseLayout
+  lang="en"
+  title="Storybook"
+  description="Indigitous Philippines component library."
+  noindex
+  bare
+>
+  <div class="flex min-h-screen">
+    <aside class="sticky top-0 hidden h-screen w-64 shrink-0 overflow-y-auto border-r border-stone bg-white px-5 py-6 lg:block">
+      <a href="/" aria-label="Home">
+        <Logo size="sm" />
+      </a>
+      <p class="eyebrow mt-2 text-muted">Storybook</p>
+      <nav class="mt-8 flex flex-col gap-6 text-sm" aria-label="Components">
+        <div>
+          <p class="eyebrow mb-2 text-brand-orange-dark">Foundations</p>
+          <ul class="flex flex-col gap-1">
+            <li>
+              <a href="#brand-colors" class="block rounded-pill px-3 py-1.5 hover:bg-mist">
+                Colors
+              </a>
+            </li>
+            <li>
+              <a href="#brand-type" class="block rounded-pill px-3 py-1.5 hover:bg-mist">
+                Typography
+              </a>
+            </li>
+            <li>
+              <a href="#brand-shape" class="block rounded-pill px-3 py-1.5 hover:bg-mist">
+                Shape & gradient
+              </a>
+            </li>
+          </ul>
+        </div>
+        {grouped.map((g) => (
+          <div>
+            <p class="eyebrow mb-2 text-brand-orange-dark">{categoryLabel[g.cat] ?? g.cat}</p>
+            <ul class="flex flex-col gap-1">
+              {g.items.map((s) => (
+                <li>
+                  <a href={`#${s.id}`} class="block rounded-pill px-3 py-1.5 hover:bg-mist">
+                    {s.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </nav>
+    </aside>
+
+    <div class="min-w-0 flex-1">
+      <header class="border-b border-stone bg-ink px-4 py-12 text-white sm:px-8 lg:px-12">
+        <p class="eyebrow text-brand-yellow">Indigitous Philippines · Design system</p>
+        <h1 class="mt-3 text-4xl md:text-5xl">Storybook</h1>
+        <p class="mt-4 max-w-2xl text-white/80">
+          Every component in <code class="font-mono text-brand-yellow">src/components</code>, with
+          its variants and usage. Brand values follow indigitous.org and the #HACK Brand Guidelines
+          (v.02.2026). Add a<code class="font-mono text-brand-yellow">*.stories.ts</code> file next
+          to a component and it shows up here.
+        </p>
+        <details class="mt-6 lg:hidden">
+          <summary class="cursor-pointer font-mono text-sm text-brand-yellow">
+            Jump to component
+          </summary>
+          <ul class="mt-3 grid grid-cols-2 gap-1 text-sm">
+            {stories.map((s) => (
+              <li>
+                <a href={`#${s.id}`} class="underline">
+                  {s.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </details>
+      </header>
+
+      <div class="flex flex-col gap-20 px-4 py-12 sm:px-8 lg:px-12">
+        <!-- Foundations -->
+        <section id="brand-colors" class="scroll-mt-6">
+          <h2 class="text-3xl">Colors</h2>
+          <p class="mt-2 text-muted">
+            Use the Tailwind utilities (e.g. <code class="font-mono">bg-brand-orange</code>,{' '}
+            <code class="font-mono">text-ink</code>). Never hard-code hex values.
+          </p>
+          <ul class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+            {colors.map((c) => (
+              <li class="overflow-hidden rounded-tile ring-1 ring-stone">
+                <div class:list={['h-24', swatchClass[c.name]]} />
+                <div class="flex flex-col gap-0.5 p-3 text-sm">
+                  <span class="font-bold">{c.name}</span>
+                  <code class="font-mono text-muted" data-css-var={`--color-${c.name}`}>
+                    var(--color-{c.name})
+                  </code>
+                  <span class="text-xs text-muted">{c.use}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section id="brand-type" class="scroll-mt-6">
+          <h2 class="text-3xl">Typography</h2>
+          <p class="mt-2 text-muted">
+            Noto Sans for headings and body. Noto Sans Mono for buttons, labels, eyebrows and
+            numbers.
+          </p>
+          <div class="mt-6 flex flex-col gap-6 rounded-card bg-mist p-6 md:p-10">
+            <p class="eyebrow text-brand-orange-dark">Eyebrow · Noto Sans Mono 500</p>
+            <p class="text-5xl font-bold tracking-tight md:text-6xl">Display · Helping Filipinos</p>
+            <p class="text-4xl font-bold tracking-tight">Heading 2 · Find your tribe</p>
+            <p class="text-2xl font-bold">Heading 3 · Coffee talk Manila</p>
+            <p class="max-w-2xl text-lg">
+              Body large · Indigitous helps followers of Jesus take the gospel to new people, places
+              and spaces.
+            </p>
+            <p class="max-w-2xl">
+              Body · Kumusta! We are developers, designers, storytellers and ministry leaders.
+            </p>
+            <p class="font-mono">Mono · 10,154 people · 174 cities · 63 countries</p>
+          </div>
+        </section>
+
+        <section id="brand-shape" class="scroll-mt-6">
+          <h2 class="text-3xl">Shape & gradient</h2>
+          <div class="mt-6 grid gap-4 md:grid-cols-4">
+            {radii.map((r) => (
+              <div class:list={['flex h-32 flex-col justify-end bg-brand-yellow p-4', r.cls]}>
+                <span class="font-bold">rounded-{r.name}</span>
+                <span class="text-xs">{r.note}</span>
+              </div>
+            ))}
+            <div class="flex h-32 flex-col justify-end rounded-card bg-brand-gradient p-4">
+              <span class="font-bold">bg-brand-gradient</span>
+              <span class="text-xs">#EF4E25 50% → #EFE974 140%</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Components -->
+        {stories.map((s) => {
+          const Comp = s.component;
+          return (
+            <section id={s.id} class="scroll-mt-6">
+              <div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-stone pb-4">
+                <div>
+                  <p class="eyebrow text-brand-orange-dark">
+                    {categoryLabel[s.category] ?? s.category}
+                  </p>
+                  <h2 class="mt-1 text-3xl">{s.title}</h2>
+                  {s.description && <p class="mt-2 max-w-2xl text-muted">{s.description}</p>}
+                </div>
+                <code class="rounded-pill bg-mist px-3 py-1 font-mono text-xs break-all">
+                  {s.file}
+                </code>
+              </div>
+              <div
+                class:list={[
+                  'mt-6 grid gap-6',
+                  s.title === 'Icon' ? 'grid-cols-3 sm:grid-cols-6 lg:grid-cols-8' : 'grid-cols-1',
+                ]}
+              >
+                {s.variants.map((v) =>
+                  s.title === 'Icon' ? (
+                    <div class="flex flex-col items-center gap-2 rounded-tile bg-mist p-4 text-center">
+                      <Comp {...v.props} />
+                      <span class="font-mono text-[11px] break-all">{v.name}</span>
+                    </div>
+                  ) : (
+                    <div class="overflow-hidden rounded-tile ring-1 ring-stone">
+                      <div class="flex items-center justify-between border-b border-stone bg-white px-4 py-2">
+                        <span class="font-mono text-sm font-medium">{v.name}</span>
+                      </div>
+                      <div
+                        class:list={[
+                          'p-6 md:p-8 [&_header.sticky]:static',
+                          v.dark ? 'bg-ink' : 'bg-white',
+                          s.width === 'full' && 'px-0! md:px-0!',
+                        ]}
+                      >
+                        <div
+                          class:list={[
+                            widths[s.width ?? 'full'] ?? 'w-full',
+                            s.width !== 'full' && 'mx-auto',
+                          ]}
+                        >
+                          <Comp {...v.props}>{v.slot && <Fragment set:html={v.slot} />}</Comp>
+                        </div>
+                      </div>
+                      <details class="border-t border-stone bg-mist">
+                        <summary class="cursor-pointer px-4 py-2 font-mono text-xs text-muted">
+                          Code & props
+                        </summary>
+                        <pre class="overflow-x-auto bg-ink p-4 font-mono text-xs leading-relaxed text-brand-yellow"><code>{toCode(s.title, v.props, v.slot)}</code></pre>
+                      </details>
+                    </div>
+                  ),
+                )}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Show the resolved hex for each color token, straight from the CSS.
+  const showTokens = () => {
+    const root = getComputedStyle(document.documentElement);
+    document.querySelectorAll<HTMLElement>('[data-css-var]').forEach((el) => {
+      const value = root.getPropertyValue(el.dataset.cssVar!).trim();
+      if (value) el.textContent = value.toUpperCase();
+    });
+  };
+  showTokens();
+  window.addEventListener('load', showTokens);
+</script>

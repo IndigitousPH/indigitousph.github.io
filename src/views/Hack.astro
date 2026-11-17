@@ -1,0 +1,208 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/sections/PageHeader.astro';
+import Section from '@/components/sections/Section.astro';
+import SectionHeading from '@/components/sections/SectionHeading.astro';
+import StatsBand from '@/components/sections/StatsBand.astro';
+import FeatureGrid, { type FeatureItem } from '@/components/sections/FeatureGrid.astro';
+import FAQ from '@/components/sections/FAQ.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import CardGrid from '@/components/sections/CardGrid.astro';
+import EventCard from '@/components/cards/EventCard.astro';
+import Button from '@/components/ui/Button.astro';
+import { site } from '@/config/site';
+import { htmlLang, localizePath, pick, useTranslations, type Lang } from '@/i18n';
+import { byDateDesc, getLocalized } from '@/lib/content';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const L = (p: string) => localizePath(p, lang);
+
+const copy = pick(
+  {
+    en: {
+      eyebrow: '#HACK Philippines',
+      title: 'Build practical solutions to take the gospel to new people, places and spaces',
+      intro:
+        '#HACK is the largest global hackathon bringing the gospel to new people, places and spaces. Every October, Filipino developers, designers, storytellers and ministry leaders join thousands around the world.',
+      join: 'Join #HACK',
+      champion: 'Become a Champion',
+      whatEyebrow: 'What is #HACK?',
+      whatTitle: 'A hackathon with a mission',
+      what: [
+        {
+          icon: 'church',
+          title: 'Real challenges',
+          body: 'Churches and ministries bring real problems they face in reaching people.',
+        },
+        {
+          icon: 'users',
+          title: 'Mixed teams',
+          body: 'Developers, designers, writers and ministry leaders work side by side.',
+        },
+        {
+          icon: 'sparkles',
+          title: 'Lasting solutions',
+          body: 'The best ideas keep going as Indigitous projects after the weekend.',
+        },
+      ],
+      statsCaption: 'Global #HACK numbers since 2016, from hack.indigitous.org.',
+      stats: [
+        { value: '10,154', label: 'people' },
+        { value: '174', label: 'cities' },
+        { value: '63', label: 'countries' },
+        { value: 'Oct', label: 'every year' },
+      ],
+      pastEyebrow: 'In the Philippines',
+      pastTitle: '#HACK events here',
+      faqTitle: 'Frequently asked questions',
+      faq: [
+        {
+          q: 'Do I need to know how to code?',
+          a: 'Not at all. Every team needs designers, writers, storytellers, project managers and ministry leaders.',
+        },
+        {
+          q: 'What is a Champion?',
+          a: 'Champions are local volunteers who host #HACK in their city, campus or church. Indigitous provides a toolkit, training and support.',
+        },
+        {
+          q: 'How much does it cost?',
+          a: 'Most #HACK Philippines events are free. Some hosts may ask for a small fee to cover food and venue.',
+        },
+        { q: 'Can I join online?', a: 'Yes. Online teams take part in #HACK every year.' },
+      ],
+      ctaTitle: 'Host #HACK in your city',
+      ctaBody:
+        'Bring #HACK to your campus, church or city as a Champion. We will walk with you every step.',
+      global: 'hack.indigitous.org',
+    },
+    fil: {
+      eyebrow: '#HACK Philippines',
+      title:
+        'Bumuo ng praktikal na solusyon para dalhin ang ebanghelyo sa mga bagong tao, lugar at espasyo',
+      intro:
+        'Ang #HACK ang pinakamalaking pandaigdigang hackathon na nagdadala ng ebanghelyo sa mga bagong tao, lugar at espasyo. Tuwing Oktubre, sumasali ang mga Pilipinong developer, designer, storyteller at lider ng ministeryo kasama ang libu-libo sa buong mundo.',
+      join: 'Sumali sa #HACK',
+      champion: 'Maging Champion',
+      whatEyebrow: 'Ano ang #HACK?',
+      whatTitle: 'Hackathon na may misyon',
+      what: [
+        {
+          icon: 'church',
+          title: 'Totoong hamon',
+          body: 'Nagdadala ang mga simbahan at ministeryo ng totoong problemang hinaharap nila sa pag-abot sa tao.',
+        },
+        {
+          icon: 'users',
+          title: 'Halo-halong team',
+          body: 'Magkakasamang nagtatrabaho ang mga developer, designer, manunulat at lider ng ministeryo.',
+        },
+        {
+          icon: 'sparkles',
+          title: 'Pangmatagalang solusyon',
+          body: 'Nagpapatuloy bilang proyekto ng Indigitous ang pinakamagagandang ideya.',
+        },
+      ],
+      statsCaption: 'Pandaigdigang bilang ng #HACK mula 2016, mula sa hack.indigitous.org.',
+      stats: [
+        { value: '10,154', label: 'tao' },
+        { value: '174', label: 'lungsod' },
+        { value: '63', label: 'bansa' },
+        { value: 'Okt', label: 'taun-taon' },
+      ],
+      pastEyebrow: 'Sa Pilipinas',
+      pastTitle: 'Mga #HACK event dito',
+      faqTitle: 'Mga madalas itanong',
+      faq: [
+        {
+          q: 'Kailangan ko bang marunong mag-code?',
+          a: 'Hindi. Kailangan ng bawat team ng designer, manunulat, storyteller, project manager at lider ng ministeryo.',
+        },
+        {
+          q: 'Ano ang Champion?',
+          a: 'Ang mga Champion ay lokal na volunteer na nagho-host ng #HACK sa kanilang lungsod, kampus o simbahan. Nagbibigay ang Indigitous ng toolkit, training at suporta.',
+        },
+        {
+          q: 'Magkano ang bayad?',
+          a: 'Libre ang karamihan ng #HACK Philippines event. Maaaring humingi ang ilang host ng maliit na bayad para sa pagkain at venue.',
+        },
+        {
+          q: 'Puwede ba akong sumali online?',
+          a: 'Oo. May mga online team na sumasali sa #HACK taun-taon.',
+        },
+      ],
+      ctaTitle: 'I-host ang #HACK sa inyong lungsod',
+      ctaBody:
+        'Dalhin ang #HACK sa inyong kampus, simbahan o lungsod bilang Champion. Sasamahan ka namin sa bawat hakbang.',
+      global: 'hack.indigitous.org',
+    },
+  },
+  lang,
+);
+const hackEvents = (await getLocalized('events', lang))
+  .filter((e) => e.data.tags.includes('hack'))
+  .sort(byDateDesc);
+---
+
+<BaseLayout {lang} title="#HACK" description={copy.intro}>
+  <PageHeader tone="ink" eyebrow={copy.eyebrow} title={copy.title} intro={copy.intro}>
+    <Button href={site.global.hack} variant="primary" external icon="arrow-up-right">
+      {copy.join}
+    </Button>
+    <Button href={L('/contact')} variant="light">
+      {copy.champion}
+    </Button>
+  </PageHeader>
+
+  <Section>
+    <SectionHeading eyebrow={copy.whatEyebrow} title={copy.whatTitle} />
+    <FeatureGrid items={copy.what as FeatureItem[]} />
+    <StatsBand stats={copy.stats} tone="yellow" caption={copy.statsCaption} class="mt-10" />
+  </Section>
+
+  {hackEvents.length > 0 && (
+    <Section tone="mist">
+      <SectionHeading eyebrow={copy.pastEyebrow} title={copy.pastTitle} />
+      <CardGrid>
+        {hackEvents.map((e) => (
+          <EventCard
+            title={e.data.title}
+            href={L(`/events/${e.slug}`)}
+            date={e.data.date}
+            location={e.data.location}
+            summary={e.data.summary}
+            online={e.data.online}
+            placeholder={e.data.placeholder}
+            lang={htmlLang[lang]}
+            labels={{
+              event: t('label.event'),
+              online: t('events.online'),
+              placeholder: t('label.placeholder'),
+            }}
+          />
+        ))}
+      </CardGrid>
+    </Section>
+  )}
+
+  <Section>
+    <div class="grid gap-10 lg:grid-cols-[1fr_1.5fr]">
+      <SectionHeading eyebrow="FAQ" title={copy.faqTitle} class="mb-0" />
+      <FAQ items={copy.faq} />
+    </div>
+  </Section>
+
+  <Section class="pt-0!">
+    <CtaBand title={copy.ctaTitle} body={copy.ctaBody}>
+      <Button href={L('/contact')} variant="dark" icon="arrow-right">
+        {copy.champion}
+      </Button>
+      <Button href={site.global.hack} variant="light" external icon="arrow-up-right">
+        {copy.global}
+      </Button>
+    </CtaBand>
+  </Section>
+</BaseLayout>

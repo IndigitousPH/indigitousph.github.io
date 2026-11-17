@@ -1,0 +1,44 @@
+---
+/** Section title with optional eyebrow, intro and a right-aligned action slot. */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  intro?: string;
+  align?: 'left' | 'center';
+  tone?: 'dark' | 'light';
+  as?: 'h2' | 'h3';
+  class?: string;
+}
+const {
+  eyebrow,
+  title,
+  intro,
+  align = 'left',
+  tone = 'dark',
+  as: Tag = 'h2',
+  class: className,
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    'mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between',
+    align === 'center' && 'items-center text-center md:flex-col md:items-center',
+    className,
+  ]}
+>
+  <div class:list={['flex max-w-2xl flex-col gap-3', align === 'center' && 'items-center']}>
+    {eyebrow && (
+      <p class:list={['eyebrow', tone === 'dark' ? 'text-brand-orange-dark' : 'text-brand-yellow']}>
+        {eyebrow}
+      </p>
+    )}
+    <Tag class:list={['text-3xl md:text-4xl', tone === 'light' && 'text-white']}>{title}</Tag>
+    {intro && (
+      <p class:list={['text-lg', tone === 'dark' ? 'text-muted' : 'text-white/80']}>{intro}</p>
+    )}
+  </div>
+  <div class="shrink-0 empty:hidden">
+    <slot />
+  </div>
+</div>

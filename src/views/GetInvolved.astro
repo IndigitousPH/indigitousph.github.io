@@ -1,0 +1,147 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/sections/PageHeader.astro';
+import Section from '@/components/sections/Section.astro';
+import SectionHeading from '@/components/sections/SectionHeading.astro';
+import FeatureGrid, { type FeatureItem } from '@/components/sections/FeatureGrid.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import Button from '@/components/ui/Button.astro';
+import { localizePath, pick, useTranslations, type Lang } from '@/i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const L = (p: string) => localizePath(p, lang);
+const copy = pick(
+  {
+    en: {
+      title: 'Find your tribe here',
+      intro:
+        'Are you a creative or developer? A pastor or campus minister? There is a way for you to be part of what God is doing through Indigitous PH.',
+      waysTitle: 'Ways to get involved',
+      ways: [
+        {
+          icon: 'code',
+          title: 'Volunteer your skills',
+          body: 'Join a project team as a developer, designer, writer, videographer or project manager.',
+          href: '/projects',
+          cta: 'See projects',
+        },
+        {
+          icon: 'sparkles',
+          title: 'Host #HACK as a Champion',
+          body: 'Bring #HACK to your city, campus or church. We provide training and a toolkit.',
+          href: '/hack',
+          cta: 'About #HACK',
+        },
+        {
+          icon: 'users',
+          title: 'Lead a community',
+          body: 'Gather tech and creative people where you are for regular meetups.',
+          href: '/communities',
+          cta: 'Communities',
+        },
+        {
+          icon: 'church',
+          title: 'Partner as a church or ministry',
+          body: 'Bring a challenge to #HACK, host an event or share Indigitous with your people.',
+          href: '/contact',
+          cta: 'Talk to us',
+        },
+        {
+          icon: 'hands-praying',
+          title: 'Pray',
+          body: 'Pray for Filipinos online, for our teams and for the people our projects serve.',
+          href: '/contact',
+          cta: 'Get prayer updates',
+        },
+        {
+          icon: 'heart',
+          title: 'Give',
+          body: 'Help fund events, tools and training for digital mission in the Philippines.',
+          href: '/give',
+          cta: 'Give',
+        },
+      ],
+      ctaTitle: 'Not sure where you fit?',
+      ctaBody: 'Take the first step. We will help you discover your place.',
+    },
+    fil: {
+      title: 'Dito mo makikita ang iyong tribo',
+      intro:
+        'Creative ka ba o developer? Pastor o campus minister? May paraan para maging bahagi ka ng ginagawa ng Diyos sa pamamagitan ng Indigitous PH.',
+      waysTitle: 'Mga paraan para makibahagi',
+      ways: [
+        {
+          icon: 'code',
+          title: 'I-volunteer ang iyong galing',
+          body: 'Sumali sa project team bilang developer, designer, manunulat, videographer o project manager.',
+          href: '/projects',
+          cta: 'Tingnan ang mga proyekto',
+        },
+        {
+          icon: 'sparkles',
+          title: 'Mag-host ng #HACK bilang Champion',
+          body: 'Dalhin ang #HACK sa inyong lungsod, kampus o simbahan. May training at toolkit kami.',
+          href: '/hack',
+          cta: 'Tungkol sa #HACK',
+        },
+        {
+          icon: 'users',
+          title: 'Manguna sa komunidad',
+          body: 'Tipunin ang mga tech at creative sa inyong lugar para sa regular na meetup.',
+          href: '/communities',
+          cta: 'Mga komunidad',
+        },
+        {
+          icon: 'church',
+          title: 'Makipag-partner bilang simbahan o ministeryo',
+          body: 'Magdala ng hamon sa #HACK, mag-host ng event o ibahagi ang Indigitous sa inyong mga tao.',
+          href: '/contact',
+          cta: 'Kausapin kami',
+        },
+        {
+          icon: 'hands-praying',
+          title: 'Manalangin',
+          body: 'Ipanalangin ang mga Pilipinong online, ang aming mga team at ang mga taong pinaglilingkuran ng aming mga proyekto.',
+          href: '/contact',
+          cta: 'Tumanggap ng prayer update',
+        },
+        {
+          icon: 'heart',
+          title: 'Magbigay',
+          body: 'Tumulong pondohan ang mga event, tool at training para sa digital na misyon sa Pilipinas.',
+          href: '/give',
+          cta: 'Magbigay',
+        },
+      ],
+      ctaTitle: 'Hindi sigurado kung saan ka babagay?',
+      ctaBody: 'Gawin ang unang hakbang. Tutulungan ka naming tuklasin ang iyong lugar.',
+    },
+  },
+  lang,
+);
+const ways = copy.ways.map((w) => ({ ...w, href: L(w.href) })) as FeatureItem[];
+---
+
+<BaseLayout {lang} title={t('nav.getInvolved')} description={copy.intro}>
+  <PageHeader
+    tone="gradient"
+    eyebrow={t('nav.getInvolved')}
+    title={copy.title}
+    intro={copy.intro}
+  />
+  <Section>
+    <SectionHeading title={copy.waysTitle} />
+    <FeatureGrid items={ways} />
+  </Section>
+  <Section class="pt-0!">
+    <CtaBand tone="ink" title={copy.ctaTitle} body={copy.ctaBody}>
+      <Button href={L('/start-here')} variant="light" icon="arrow-right">
+        {t('nav.startHere')}
+      </Button>
+    </CtaBand>
+  </Section>
+</BaseLayout>

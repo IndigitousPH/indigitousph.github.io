@@ -1,0 +1,99 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/sections/PageHeader.astro';
+import Section from '@/components/sections/Section.astro';
+import CardGrid from '@/components/sections/CardGrid.astro';
+import EventCard from '@/components/cards/EventCard.astro';
+import SwitchTabs from '@/components/ui/SwitchTabs.astro';
+import { htmlLang, localizePath, pick, useTranslations, type Lang } from '@/i18n';
+import { byDateAsc, getLocalized } from '@/lib/content';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const copy = pick(
+  {
+    en: {
+      title: 'Events',
+      intro: 'Coffee talks, meetups, workshops and #HACK — online and across the Philippines.',
+    },
+    fil: {
+      title: 'Mga event',
+      intro: 'Coffee talk, meetup, workshop at #HACK — online at sa buong Pilipinas.',
+    },
+  },
+  lang,
+);
+const events = (await getLocalized('events', lang)).sort(byDateAsc);
+---
+
+<BaseLayout {lang} title={t('nav.events')} description={copy.intro}>
+  <PageHeader eyebrow={t('nav.events')} title={copy.title} intro={copy.intro} />
+  <Section>
+    <SwitchTabs
+      filterGroup="events"
+      active="upcoming"
+      label={t('nav.events')}
+      class="mb-10"
+      items={[
+        { label: t('events.upcoming'), value: 'upcoming' },
+        { label: t('events.past'), value: 'past' },
+        { label: t('events.all'), value: 'all' },
+      ]}
+    />
+    <CardGrid>
+      {events.map((e) => (
+        <div
+          data-filter-group="events"
+          data-event-date={e.data.date.toISOString()}
+          data-filter-tags=""
+        >
+          <EventCard
+            title={e.data.title}
+            href={localizePath(`/events/${e.slug}`, lang)}
+            date={e.data.date}
+            location={e.data.location}
+            summary={e.data.summary}
+            image={e.data.image}
+            online={e.data.online}
+            placeholder={e.data.placeholder}
+            lang={htmlLang[lang]}
+            labels={{
+              event: t('label.event'),
+              online: t('events.online'),
+              placeholder: t('label.placeholder'),
+            }}
+          />
+        </div>
+      ))}
+    </CardGrid>
+    <p class="hidden py-10 text-center text-muted" data-events-empty>
+      {t('events.none')}
+    </p>
+  </Section>
+</BaseLayout>
+
+<script>
+  // Tag each event as upcoming/past using the visitor's clock (the site is static),
+  // then re-trigger the active filter.
+  const now = Date.now() - 24 * 60 * 60 * 1000;
+  const cards = document.querySelectorAll<HTMLElement>('[data-filter-group="events"]');
+  cards.forEach((el) => {
+    el.dataset.filterTags = new Date(el.dataset.eventDate!).getTime() >= now ? 'upcoming' : 'past';
+  });
+  const empty = document.querySelector<HTMLElement>('[data-events-empty]');
+  const update = () =>
+    empty?.classList.toggle(
+      'hidden',
+      [...cards].some((c) => !c.hidden),
+    );
+  document
+    .querySelectorAll<HTMLButtonElement>('[data-switch-tabs="events"] button')
+    .forEach((b) => b.addEventListener('click', () => requestAnimationFrame(update)));
+  document
+    .querySelector<HTMLButtonElement>('[data-switch-tabs="events"] button[aria-pressed="true"]')
+    ?.click();
+  window.addEventListener('load', update);
+</script>

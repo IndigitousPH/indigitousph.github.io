@@ -1,0 +1,27 @@
+---
+/**
+ * Indigitous Philippines wordmark.
+ * TODO(brand): replace with the official Indigitous logo files from the global team.
+ */
+interface Props {
+  tone?: 'dark' | 'light';
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+}
+const { tone = 'dark', size = 'md', class: className } = Astro.props;
+const sizes = { sm: 'text-lg', md: 'text-2xl', lg: 'text-4xl' };
+---
+
+<span class:list={['inline-flex flex-col leading-none select-none', sizes[size], className]}>
+  <span class:list={['font-bold tracking-tight', tone === 'dark' ? 'text-ink' : 'text-white']}>
+    indigitous<span class="text-brand-orange">.</span>
+  </span>
+  <span
+    class:list={[
+      'mt-1 font-mono text-[0.42em] font-medium tracking-[0.3em] uppercase',
+      tone === 'dark' ? 'text-brand-orange-dark' : 'text-brand-yellow',
+    ]}
+  >
+    Philippines
+  </span>
+</span>

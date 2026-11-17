@@ -1,0 +1,66 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+/**
+ * Pill button / link. Renders <a> when `href` is set, otherwise <button>.
+ * Variants: primary (orange), dark (ink), light (white, for dark/orange backgrounds),
+ * outline, ghost (text link with arrow).
+ */
+interface Props {
+  variant?: 'primary' | 'dark' | 'light' | 'outline' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  icon?: IconName;
+  iconPosition?: 'start' | 'end';
+  external?: boolean;
+  fullWidth?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  type = 'button',
+  icon,
+  iconPosition = 'end',
+  external = false,
+  fullWidth = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const variants = {
+  primary: 'bg-brand-orange-dark text-white hover:bg-ink',
+  dark: 'bg-ink text-white hover:bg-brand-orange-dark',
+  light: 'bg-white text-ink hover:bg-brand-yellow',
+  outline: 'border-2 border-ink text-ink hover:bg-ink hover:text-white',
+  ghost: 'text-brand-orange-dark hover:text-ink px-0! underline-offset-4 hover:underline',
+};
+const sizes = {
+  sm: 'text-sm px-4 py-2 gap-1.5',
+  md: 'text-base px-6 py-3 gap-2',
+  lg: 'text-lg px-8 py-4 gap-2.5',
+};
+const iconSize = { sm: 16, md: 18, lg: 20 }[size];
+
+const classes = [
+  'inline-flex items-center justify-center rounded-pill font-mono font-medium leading-tight text-center transition-colors duration-200 cursor-pointer',
+  variants[variant],
+  sizes[size],
+  fullWidth && 'w-full',
+  className,
+];
+const Tag = href ? 'a' : 'button';
+const linkAttrs = href
+  ? { href, ...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {}) }
+  : { type };
+---
+
+<Tag class:list={classes} {...linkAttrs} {...rest}>
+  {icon && iconPosition === 'start' && <Icon name={icon} size={iconSize} />}
+  <slot />
+  {icon && iconPosition === 'end' && <Icon name={icon} size={iconSize} />}
+</Tag>

@@ -1,0 +1,13 @@
+---
+import EventDetail from '@/views/EventDetail.astro';
+import { getLocalized } from '@/lib/content';
+
+export async function getStaticPaths() {
+  const entries = await getLocalized('events', 'en');
+  return entries.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+---
+
+<EventDetail lang="en" {entry} />
