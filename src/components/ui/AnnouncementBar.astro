@@ -1,0 +1,64 @@
+---
+import Icon from './Icon.astro';
+
+/**
+ * Thin dismissible strip above the header. Driven by the "announcement" entry in
+ * src/content/site/site.json. Hidden after `endDate` (at build time and in the browser).
+ */
+interface Props {
+  text: string;
+  linkText?: string;
+  href?: string;
+  endDate: Date;
+  dismissLabel?: string;
+}
+const { text, linkText, href, endDate, dismissLabel = 'Dismiss' } = Astro.props;
+const key = `ann:${text}`;
+---
+
+<div
+  class="relative bg-brand-yellow text-ink"
+  data-announcement={key}
+  data-expires={endDate.toISOString()}
+  role="region"
+  aria-label="Announcement"
+>
+  <div class="container-page flex items-center justify-center gap-3 py-2.5 pr-12 text-center text-sm font-medium">
+    <p>
+      {text}
+      {href && linkText && (
+        <a
+          href={href}
+          class="ml-1 font-mono font-bold whitespace-nowrap underline underline-offset-4 hover:text-brand-orange-dark"
+        >
+          {linkText} →
+        </a>
+      )}
+    </p>
+  </div>
+  <button
+    type="button"
+    class="absolute top-1/2 right-2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full hover:bg-ink/10"
+    data-dismiss
+  >
+    <span class="sr-only">{dismissLabel}</span>
+    <Icon name="close" size={18} />
+  </button>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-announcement]').forEach((bar) => {
+    const key = bar.dataset.announcement!;
+    let dismissed = false;
+    try {
+      dismissed = localStorage.getItem(key) === '1';
+    } catch {}
+    if (dismissed || new Date(bar.dataset.expires!).getTime() < Date.now()) bar.remove();
+    bar.querySelector('[data-dismiss]')?.addEventListener('click', () => {
+      try {
+        localStorage.setItem(key, '1');
+      } catch {}
+      bar.remove();
+    });
+  });
+</script>

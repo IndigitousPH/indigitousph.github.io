@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  # Daily rebuild at 00:05 Manila time (16:05 UTC) so ended events and announcements drop off.
+  schedule:
+    - cron: '5 16 * * *'
 
 permissions:
   contents: read
@@ -26,6 +29,7 @@ jobs:
           package-manager: pnpm@12.16.1
         env:
           PUBLIC_FORM_ENDPOINT: ${{ vars.PUBLIC_FORM_ENDPOINT }}
+          PUBLIC_PRAYER_ENDPOINT: ${{ vars.PUBLIC_PRAYER_ENDPOINT }}
           PUBLIC_NEWSLETTER_ENDPOINT: ${{ vars.PUBLIC_NEWSLETTER_ENDPOINT }}
 
   deploy:

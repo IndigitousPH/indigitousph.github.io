@@ -1,0 +1,93 @@
+---
+/** Local Networks: turns interest into belonging — where networks meet, how to join one, or start one. */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Section from '@/components/sections/Section.astro';
+import SectionHeading from '@/components/sections/SectionHeading.astro';
+import FeatureGrid, { type FeatureItem } from '@/components/sections/FeatureGrid.astro';
+import StartBand from '@/components/sections/StartBand.astro';
+import NetworkCard from '@/components/cards/NetworkCard.astro';
+import InterestForm from '@/components/forms/InterestForm.astro';
+import Button from '@/components/ui/Button.astro';
+import { byOrder, getAll } from '@/lib/content';
+
+const copy = {
+  hero: {
+    title: 'Find your people.',
+    intro:
+      'Local networks are where believers near you meet, pray and dream about missions in a digital age.',
+  },
+  happens: {
+    title: 'What happens in a local network',
+    items: [
+      {
+        icon: 'users',
+        title: 'Meet',
+        body: 'Regular gatherings, online and in person, to share what God is doing.',
+      },
+      {
+        icon: 'hands-praying',
+        title: 'Pray',
+        body: 'For each other and for the people we reach online.',
+      },
+      {
+        icon: 'book',
+        title: 'Learn',
+        body: 'Workshops on storytelling, design, content and sharing your faith online.',
+      },
+      { icon: 'hammer', title: 'Build', body: 'Team up on projects and #HACK sprints.' },
+    ] satisfies FeatureItem[],
+  },
+  directory: { title: 'Local networks across the Philippines' },
+  start: {
+    title: 'No network near you yet?',
+    body: 'Maybe God is inviting you to start one. We’ll walk with you, from your first prayer meeting to your first #HACK.',
+    cta: 'Start a local network',
+  },
+  form: { title: 'Let’s get you connected' },
+};
+
+const networks = (await getAll('networks')).sort(byOrder);
+---
+
+<BaseLayout title="Local Networks" description={copy.hero.intro}>
+  <PageHero eyebrow="Local Networks" title={copy.hero.title} intro={copy.hero.intro} />
+
+  <Section>
+    <SectionHeading title={copy.happens.title} />
+    <FeatureGrid items={copy.happens.items} variant="plain" cols={4} />
+  </Section>
+
+  <Section tone="mist">
+    <SectionHeading title={copy.directory.title} />
+    <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {networks.map((n) => (
+        <li>
+          <NetworkCard
+            city={n.data.city}
+            region={n.data.region}
+            description={n.data.description}
+            meets={n.data.meets}
+            href={n.data.contactUrl ?? '#connect'}
+            placeholder={n.data.placeholder}
+          />
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section>
+    <StartBand title={copy.start.title} body={copy.start.body}>
+      <Button href="#connect" icon="arrow-right">
+        {copy.start.cta}
+      </Button>
+    </StartBand>
+  </Section>
+
+  <Section tone="mist" id="connect" class="scroll-mt-20">
+    <div class="mx-auto max-w-3xl">
+      <SectionHeading title={copy.form.title} />
+      <InterestForm />
+    </div>
+  </Section>
+</BaseLayout>

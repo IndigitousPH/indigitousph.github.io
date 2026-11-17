@@ -1,0 +1,58 @@
+---
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import PillTag from '../ui/PillTag.astro';
+
+/** Local network card (deck: NetworkCards): city, description, meeting rhythm, connect button. */
+interface Props {
+  city: string;
+  region?: string;
+  description: string;
+  meets?: string;
+  href: string;
+  placeholder?: boolean;
+  class?: string;
+}
+const {
+  city,
+  region,
+  description,
+  meets,
+  href,
+  placeholder = false,
+  class: className,
+} = Astro.props;
+---
+
+<article
+  class:list={['flex h-full flex-col gap-4 rounded-card bg-white p-7 ring-1 ring-stone', className]}
+>
+  <div class="flex flex-wrap items-center gap-2">
+    {region && (
+      <span class="eyebrow flex items-center gap-1.5 text-brand-orange-dark">
+        <Icon name="map-pin" size={14} />
+        {region}
+      </span>
+    )}
+    {placeholder && (
+      <PillTag tone="outline" size="sm">
+        Sample content
+      </PillTag>
+    )}
+  </div>
+  <h3 class="text-2xl">Indigitous {city}</h3>
+  <p class="text-ink-2">{description}</p>
+  <p class="flex items-center gap-2 font-mono text-sm text-ink-2">
+    <Icon name="calendar" size={16} />
+    Meets: {meets ?? 'ask us for the next gathering'}
+  </p>
+  <Button
+    href={href}
+    variant="dark"
+    size="sm"
+    icon="arrow-right"
+    class="mt-auto self-start max-w-full"
+  >
+    Connect with {city}
+  </Button>
+</article>

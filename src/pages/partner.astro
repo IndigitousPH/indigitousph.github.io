@@ -1,0 +1,78 @@
+---
+/** Partner & Give: three partnership cards, one clear giving section, a short trust line. */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Section from '@/components/sections/Section.astro';
+import FeatureGrid, { type FeatureItem } from '@/components/sections/FeatureGrid.astro';
+import Button from '@/components/ui/Button.astro';
+import { site } from '@/config/site';
+
+const copy = {
+  hero: {
+    title: 'Partner with what God is doing online.',
+    intro:
+      'Churches, ministries and friends make this work possible through prayer, skills and giving.',
+  },
+  cards: [
+    {
+      icon: 'church',
+      title: 'Churches',
+      body: 'Host a #HACK, start a local network in your church, or send your creatives.',
+      href: '/contact',
+      cta: 'Talk to us',
+    },
+    {
+      icon: 'lightbulb',
+      title: 'Ministries',
+      body: 'Bring a real challenge to #HACK and get a team working on it.',
+      href: '/contact',
+      cta: 'Share a challenge',
+    },
+    {
+      icon: 'heart',
+      title: 'Individuals',
+      body: 'Give monthly or once to help train and send believers.',
+      href: '#give',
+      cta: 'Give now',
+    },
+  ] satisfies FeatureItem[],
+  give: {
+    title: 'Your gift sends the gospel further.',
+    body: 'Every peso helps run #HACK sprints, train online workers and grow local networks across the Philippines.',
+    // TODO(content): GCash / bank / online platform details, receipt email and the trust line.
+    pending:
+      'Giving details (GCash, bank transfer or an online giving platform) are being finalised. Message us and we’ll send them to you.',
+  },
+};
+---
+
+<BaseLayout title="Partner & Give" description={copy.hero.intro}>
+  <PageHero
+    tone="gradient"
+    eyebrow="Partner & Give"
+    title={copy.hero.title}
+    intro={copy.hero.intro}
+  />
+
+  <Section>
+    <FeatureGrid items={copy.cards} />
+  </Section>
+
+  <Section tone="mist" id="give" class="scroll-mt-20">
+    <div class="mx-auto flex max-w-2xl flex-col items-center gap-6 text-center">
+      <h2 class="text-3xl md:text-4xl">{copy.give.title}</h2>
+      <p class="text-lg text-ink-2">{copy.give.body}</p>
+      <p class="rounded-tile bg-white p-5 text-ink-2">{copy.give.pending}</p>
+      <Button href="/contact" size="lg" icon="arrow-right">
+        Ask about giving
+      </Button>
+      <p class="font-mono text-sm text-muted">
+        Indigitous Philippines is part of the global{' '}
+        <a href={site.global.home} class="underline">
+          Indigitous
+        </a>{' '}
+        movement.
+      </p>
+    </div>
+  </Section>
+</BaseLayout>

@@ -1,5 +1,54 @@
 ---
-import Contact from '@/views/Contact.astro';
+/** Contact: form left, direct details right. */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Section from '@/components/sections/Section.astro';
+import ContactForm from '@/components/forms/ContactForm.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/config/site';
+
+const copy = {
+  title: 'Kumusta! Let’s talk.',
+  intro: 'Questions, ideas, partnership, or just want to say hi? We’d love to hear from you.',
+};
 ---
 
-<Contact lang="en" />
+<BaseLayout title="Contact" description={copy.intro}>
+  <PageHero eyebrow="Contact" title={copy.title} intro={copy.intro} />
+  <Section>
+    <div class="grid gap-12 lg:grid-cols-[1.5fr_1fr]">
+      <ContactForm />
+      <aside class="flex flex-col gap-4">
+        <h2 class="eyebrow text-brand-orange-dark">Reach us directly</h2>
+        <ul class="flex flex-col gap-3">
+          {site.contactEmail && (
+            <li>
+              <a
+                href={`mailto:${site.contactEmail}`}
+                class="flex items-center gap-3 rounded-pill bg-mist px-5 py-3 font-medium hover:bg-brand-yellow"
+              >
+                <Icon name="mail" /> {site.contactEmail}
+              </a>
+            </li>
+          )}
+          {site.socials.map((s) => (
+            <li>
+              <a
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-3 rounded-pill bg-mist px-5 py-3 font-medium hover:bg-brand-yellow"
+              >
+                <Icon name={s.icon} /> {s.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="flex items-center gap-2 pt-2 text-ink-2">
+          <Icon name="map-pin" size={18} />
+          {site.basedIn}
+        </p>
+      </aside>
+    </div>
+  </Section>
+</BaseLayout>

@@ -4,10 +4,8 @@ import Header from './Header.astro';
 export default {
   title: 'Header',
   component: Header,
-  description: 'Sticky header. Below 1280px the nav collapses into a menu button.',
+  description:
+    'Sticky header. Below 1024px the nav becomes a menu button that opens a full-screen drawer.',
   width: 'full',
-  variants: [
-    { name: 'English', props: { lang: 'en' } },
-    { name: 'Filipino', props: { lang: 'fil' } },
-  ],
+  variants: [{ name: 'Default' }],
 } satisfies Story;

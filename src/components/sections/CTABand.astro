@@ -1,0 +1,55 @@
+---
+/**
+ * Closing call to action (deck: CTABand, reused on inner pages). Buttons go in the default slot.
+ * `align="center"` gives the full-width, centred home-page version.
+ */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  body?: string;
+  tone?: 'gradient' | 'ink' | 'yellow';
+  align?: 'split' | 'center';
+  class?: string;
+}
+const { eyebrow, title, body, tone = 'gradient', align = 'split', class: className } = Astro.props;
+const tones = {
+  gradient: 'bg-brand-gradient text-ink',
+  ink: 'bg-ink text-white',
+  yellow: 'bg-brand-yellow text-ink',
+};
+const center = align === 'center';
+---
+
+<div
+  class:list={[
+    'relative overflow-hidden rounded-card px-6 py-12 md:px-14 md:py-16',
+    tones[tone],
+    className,
+  ]}
+>
+  <div
+    class="pointer-events-none absolute -right-16 -bottom-24 font-mono text-[16rem] leading-none font-bold opacity-10 select-none"
+    aria-hidden="true"
+  >
+    #
+  </div>
+  <div
+    class:list={[
+      'relative flex flex-col gap-8',
+      center ? 'items-center text-center' : 'md:flex-row md:items-end md:justify-between',
+    ]}
+  >
+    <div class:list={['flex max-w-2xl flex-col gap-4', center && 'items-center']}>
+      {eyebrow && (
+        <p class:list={['eyebrow', tone === 'ink' ? 'text-brand-yellow' : 'text-ink']}>{eyebrow}</p>
+      )}
+      <h2 class="text-3xl leading-tight md:text-4xl">{title}</h2>
+      {body && (
+        <p class:list={['text-lg', tone === 'ink' ? 'text-white/85' : 'text-ink-2']}>{body}</p>
+      )}
+    </div>
+    <div class:list={['flex shrink-0 flex-wrap gap-3', center && 'justify-center']}>
+      <slot />
+    </div>
+  </div>
+</div>

@@ -1,0 +1,24 @@
+---
+/** "The why" (deck block 2): short text left, one striking verse or stat right. */
+interface Props {
+  title: string;
+  body: string;
+  /** Scripture or stat shown large on the right. */
+  quote: string;
+  /** Citation, e.g. "Matthew 28:19". Scripture is always cited. */
+  cite?: string;
+  class?: string;
+}
+const { title, body, quote, cite, class: className } = Astro.props;
+---
+
+<div class:list={['grid items-center gap-10 lg:grid-cols-[1.3fr_1fr]', className]}>
+  <div class="flex flex-col gap-5">
+    <h2 class="text-3xl md:text-4xl">{title}</h2>
+    <p class="text-lg leading-relaxed text-ink-2">{body}</p>
+  </div>
+  <figure class="rounded-card bg-mist p-8 md:p-10">
+    <blockquote class="text-2xl leading-snug font-bold md:text-3xl">“{quote}”</blockquote>
+    {cite && <figcaption class="eyebrow mt-4 text-brand-orange-dark">— {cite}</figcaption>}
+  </figure>
+</div>

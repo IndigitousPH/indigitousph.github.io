@@ -8,7 +8,15 @@ export default {
   variants: [
     {
       name: 'Default',
-      props: { name: 'Juan dela Cruz', role: 'Country lead', community: 'Manila' },
+      props: {
+        name: 'Juan dela Cruz',
+        role: 'Network Engagements Lead',
+        serveBecause: 'I serve because…',
+      },
+    },
+    {
+      name: 'Sample content',
+      props: { name: 'Maria dela Cruz', role: '#HACK Lead', placeholder: true },
     },
   ],
 } satisfies Story;

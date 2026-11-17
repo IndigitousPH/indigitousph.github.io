@@ -1,5 +1,69 @@
 ---
-import Stories from '@/views/Stories.astro';
+/** Stories: filterable card grid. Each story is a Markdown file in src/content/stories. */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Section from '@/components/sections/Section.astro';
+import CardGrid from '@/components/sections/CardGrid.astro';
+import StoryCard from '@/components/cards/StoryCard.astro';
+import SwitchTabs from '@/components/ui/SwitchTabs.astro';
+import { storyCategories, type StoryCategory } from '@/content.config';
+import { byDateDesc, getAll } from '@/lib/content';
+
+const copy = {
+  title: 'What God is doing',
+  intro: 'Stories from Filipino believers living out missions in a digital age.',
+  empty: 'No stories here yet. Have one to share?',
+  emptyLink: 'Tell us your story',
+};
+const stories = (await getAll('stories')).sort(byDateDesc);
+const categories = Object.entries(storyCategories) as [StoryCategory, string][];
 ---
 
-<Stories lang="en" />
+<BaseLayout title="Stories" description={copy.intro}>
+  <PageHero tone="ink" eyebrow="Stories" title={copy.title} intro={copy.intro} />
+  <Section>
+    <SwitchTabs
+      filterGroup="stories"
+      active="all"
+      label="Filter stories"
+      class="mb-10"
+      items={[
+        { label: 'All', value: 'all' },
+        ...categories.map(([value, label]) => ({ label, value })),
+      ]}
+    />
+    <CardGrid>
+      {stories.map((s) => (
+        <div data-filter-group="stories" data-filter-tags={s.data.category}>
+          <StoryCard
+            title={s.data.title}
+            href={`/stories/${s.id}`}
+            date={s.data.date}
+            summary={s.data.summary}
+            category={storyCategories[s.data.category]}
+            image={s.data.image}
+            placeholder={s.data.placeholder}
+          />
+        </div>
+      ))}
+    </CardGrid>
+    <p class="hidden py-12 text-center text-lg text-muted" data-stories-empty>
+      {copy.empty}{' '}
+      <a href="/contact" class="font-medium text-brand-orange-dark underline underline-offset-4">
+        {copy.emptyLink} →
+      </a>
+    </p>
+  </Section>
+</BaseLayout>
+
+<script>
+  const cards = document.querySelectorAll<HTMLElement>('[data-filter-group="stories"]');
+  const empty = document.querySelector<HTMLElement>('[data-stories-empty]');
+  const update = () =>
+    empty?.classList.toggle(
+      'hidden',
+      [...cards].some((c) => !c.hidden),
+    );
+  document.querySelector('[data-switch-tabs="stories"]')?.addEventListener('filter', update);
+  update();
+</script>

@@ -1,13 +1,70 @@
 ---
-import StoryDetail from '@/views/StoryDetail.astro';
-import { getLocalized } from '@/lib/content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/sections/Section.astro';
+import CTABand from '@/components/sections/CTABand.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import PillTag from '@/components/ui/PillTag.astro';
+import { render } from 'astro:content';
+import { storyCategories } from '@/content.config';
+import { formatDate } from '@/i18n';
+import { getAll, type Entry } from '@/lib/content';
 
 export async function getStaticPaths() {
-  const entries = await getLocalized('stories', 'en');
-  return entries.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+  return (await getAll('stories')).map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
 }
 
-const { entry } = Astro.props;
+const { entry } = Astro.props as { entry: Entry<'stories'> };
+const { Content } = await render(entry);
+const d = entry.data;
 ---
 
-<StoryDetail lang="en" {entry} />
+<BaseLayout title={d.title} description={d.summary} image={d.image}>
+  <article>
+    <header class="bg-mist">
+      <div class="container-page flex flex-col gap-5 py-16 md:py-20">
+        <a
+          href="/stories"
+          class="inline-flex w-max items-center gap-2 font-mono text-sm text-muted hover:text-brand-orange-dark"
+        >
+          <Icon name="arrow-left" size={16} />
+          Stories
+        </a>
+        <div class="flex flex-wrap gap-2">
+          <PillTag size="sm">{storyCategories[d.category]}</PillTag>
+          {d.placeholder && (
+            <PillTag tone="outline" size="sm">
+              Sample content
+            </PillTag>
+          )}
+        </div>
+        <h1 class="max-w-4xl text-4xl md:text-5xl">{d.title}</h1>
+        <p class="max-w-2xl text-lg text-ink-2">{d.summary}</p>
+        <p class="font-mono text-sm text-muted">
+          By {d.author} ·{' '}
+          <time datetime={d.date.toISOString()}>{formatDate(d.date, { month: 'long' })}</time>
+        </p>
+      </div>
+    </header>
+    {d.image && (
+      <div class="container-page pt-10">
+        <img src={d.image} alt="" class="aspect-[2/1] w-full rounded-card object-cover" />
+      </div>
+    )}
+    <Section>
+      <div class="prose-indigitous mx-auto">
+        <Content />
+      </div>
+    </Section>
+  </article>
+  <Section class="pt-0!">
+    <CTABand tone="yellow" title="Inspired?" body="There’s a place for your gifts too.">
+      <Button href="/networks" variant="dark" icon="arrow-right">
+        Find your local network
+      </Button>
+    </CTABand>
+  </Section>
+</BaseLayout>

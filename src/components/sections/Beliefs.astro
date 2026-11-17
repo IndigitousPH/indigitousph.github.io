@@ -1,0 +1,37 @@
+---
+import Button from '../ui/Button.astro';
+
+/** "What we believe" (deck): three short statements in a row, optional statement-of-faith link. */
+interface Props {
+  title?: string;
+  items: { title: string; body: string }[];
+  linkText?: string;
+  href?: string;
+  class?: string;
+}
+const { title, items, linkText, href, class: className } = Astro.props;
+---
+
+<div class:list={['flex flex-col gap-8', className]}>
+  {title && <h2 class="text-3xl md:text-4xl">{title}</h2>}
+  <ul class="grid gap-6 md:grid-cols-3">
+    {items.map((item, i) => (
+      <li class="flex flex-col gap-3 border-t-4 border-brand-orange pt-5">
+        <span class="font-mono text-sm text-muted">0{i + 1}</span>
+        <h3 class="text-2xl">{item.title}</h3>
+        <p class="text-ink-2">{item.body}</p>
+      </li>
+    ))}
+  </ul>
+  {href && linkText && (
+    <Button
+      href={href}
+      variant="ghost"
+      external
+      icon="arrow-up-right"
+      class="self-start max-w-full"
+    >
+      {linkText}
+    </Button>
+  )}
+</div>

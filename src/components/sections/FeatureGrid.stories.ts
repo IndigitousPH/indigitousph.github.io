@@ -4,27 +4,59 @@ import FeatureGrid from './FeatureGrid.astro';
 export default {
   title: 'FeatureGrid',
   component: FeatureGrid,
+  description: 'Used as the deck’s Pillars (cards) and IconList (plain).',
   width: 'full',
   variants: [
     {
-      name: 'Three columns',
+      name: 'Pillars (cards)',
       props: {
         items: [
           {
-            icon: 'code',
-            title: 'Developers',
-            body: 'Build apps and tools that serve the church.',
+            icon: 'users',
+            title: 'Gather',
+            body: 'Local networks of believers who meet, pray and dream together about missions in a digital age.',
             href: '#',
-            cta: 'Start building',
+            cta: 'Find a network',
           },
           {
-            icon: 'palette',
-            title: 'Designers',
-            body: 'Make the gospel look as good as it is.',
+            icon: 'lightbulb',
+            title: 'Create',
+            body: '#HACK sprints where teams turn ideas into apps, campaigns, art and content that point people to Jesus.',
             href: '#',
-            cta: 'Start designing',
+            cta: 'See #HACK',
           },
-          { icon: 'video', title: 'Content creators', body: 'Tell stories that point to Jesus.' },
+          {
+            icon: 'hands-praying',
+            title: 'Pray & serve',
+            body: 'A praying community that stands behind believers who share the gospel online every day.',
+            href: '#',
+            cta: 'Join the prayer time',
+          },
+        ],
+      },
+    },
+    {
+      name: 'IconList (plain, 4 columns)',
+      props: {
+        variant: 'plain',
+        cols: 4,
+        items: [
+          {
+            icon: 'users',
+            title: 'Meet',
+            body: 'Regular gatherings, online and in person, to share what God is doing.',
+          },
+          {
+            icon: 'hands-praying',
+            title: 'Pray',
+            body: 'For each other and for the people we reach online.',
+          },
+          {
+            icon: 'book',
+            title: 'Learn',
+            body: 'Workshops on storytelling, design, content and sharing your faith online.',
+          },
+          { icon: 'hammer', title: 'Build', body: 'Team up on projects and #HACK sprints.' },
         ],
       },
     },

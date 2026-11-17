@@ -1,5 +1,107 @@
 ---
-import Resources from '@/views/Resources.astro';
+/** Resources (footer only): tools and research for missions in a digital age. */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Section from '@/components/sections/Section.astro';
+import SectionHeading from '@/components/sections/SectionHeading.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/config/site';
+
+const copy = {
+  title: 'Tools for missions in a digital age',
+  intro:
+    'Apps, guides and research we love, picked for Filipino churches, ministries and believers who serve online.',
+  groups: [
+    {
+      title: 'Apps & tools',
+      links: [
+        {
+          title: 'GodTools',
+          body: 'Free tools to start gospel conversations, available in many languages.',
+          href: 'https://godtoolsapp.com',
+        },
+        {
+          title: 'Jesus Film Project',
+          body: 'The JESUS film and other videos in hundreds of languages, including Tagalog and Cebuano.',
+          href: 'https://www.jesusfilm.org',
+        },
+        {
+          title: 'Indigitous: Apps & tools',
+          body: 'Articles on tools for sharing your faith online, from the global movement.',
+          href: 'https://indigitous.org/topic/apps-tools/',
+        },
+      ],
+    },
+    {
+      title: 'Learn',
+      links: [
+        {
+          title: 'Indigitous Learn',
+          body: 'Guides on platforms, apps and sharing your faith online.',
+          href: site.global.learn,
+        },
+        {
+          title: 'Platforms: Facebook, Instagram, TikTok',
+          body: 'How ministries serve on the platforms Filipinos use most.',
+          href: 'https://indigitous.org/topic/platforms/',
+        },
+        {
+          title: 'For missions',
+          body: 'Hackathons, apps and outreach for ministry.',
+          href: 'https://indigitous.org/topic/for-missions/',
+        },
+      ],
+    },
+    {
+      title: 'Research',
+      links: [
+        {
+          title: 'Indigitous reports',
+          body: 'Including the State of Digital Technologies report.',
+          href: site.global.reports,
+        },
+        {
+          title: 'Who are frontier people groups?',
+          body: 'An illustrated prayer toolkit covering 31 people groups.',
+          href: site.global.frontierPeopleGroups,
+        },
+        {
+          title: '#HACK around the world',
+          body: 'What #HACK teams have built in cities everywhere.',
+          href: site.global.hack,
+        },
+      ],
+    },
+  ],
+};
 ---
 
-<Resources lang="en" />
+<BaseLayout title="Resources" description={copy.intro}>
+  <PageHero eyebrow="Resources" title={copy.title} intro={copy.intro} />
+  {copy.groups.map((group, i) => (
+    <Section tone={i % 2 ? 'mist' : 'white'}>
+      <SectionHeading title={group.title} />
+      <ul class="grid gap-4 md:grid-cols-3">
+        {group.links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group flex h-full flex-col gap-3 rounded-card bg-white p-7 ring-1 ring-stone transition hover:ring-2 hover:ring-brand-orange"
+            >
+              <span class="flex items-start justify-between gap-4 text-xl font-bold">
+                {link.title}
+                <Icon
+                  name="arrow-up-right"
+                  class="text-brand-orange-dark transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                />
+              </span>
+              <span class="text-muted">{link.body}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  ))}
+</BaseLayout>

@@ -1,0 +1,37 @@
+---
+import Icon from '../ui/Icon.astro';
+
+/** "Part of something bigger" (deck): thin band linking to Indigitous global. */
+interface Props {
+  text: string;
+  linkText: string;
+  href: string;
+  class?: string;
+}
+const { text, linkText, href, class: className } = Astro.props;
+---
+
+<div
+  class:list={[
+    'relative overflow-hidden rounded-card bg-ink-2 px-6 py-8 text-white md:px-10',
+    className,
+  ]}
+>
+  <Icon
+    name="globe"
+    size={160}
+    class="pointer-events-none absolute -top-6 -right-6 text-white/10"
+  />
+  <div class="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <p class="max-w-2xl text-lg">{text}</p>
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex w-max items-center gap-2 font-mono font-medium text-brand-yellow hover:underline"
+    >
+      {linkText}
+      <Icon name="arrow-up-right" size={18} />
+    </a>
+  </div>
+</div>

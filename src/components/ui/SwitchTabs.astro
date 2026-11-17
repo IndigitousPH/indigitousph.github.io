@@ -2,7 +2,8 @@
 /**
  * Pill segmented control (the black active tab from indigitous.org).
  * Pure links by default. With `filterGroup`, it becomes a client-side filter:
- * items with `data-filter-group="<group>"` and `data-filter-tags="a b c"` are shown/hidden.
+ * items with `data-filter-group="<group>"` and `data-filter-tags="a b c"` are shown/hidden,
+ * then the group fires a bubbling `filter` event (detail = selected value).
  */
 interface Item {
   label: string;
@@ -73,6 +74,8 @@ const {
           const tags = (el.dataset.filterTags ?? '').split(' ');
           el.hidden = !(value === 'all' || tags.includes(value));
         });
+        // Let the page react (e.g. show an "empty" message) after filtering.
+        group.dispatchEvent(new CustomEvent('filter', { bubbles: true, detail: value }));
       };
       buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.value!)));
       const initial = group.querySelector<HTMLButtonElement>('button[aria-pressed="true"]');
