@@ -1,0 +1,13 @@
+---
+import ProjectDetail from '@/views/ProjectDetail.astro';
+import { getLocalized } from '@/lib/content';
+
+export async function getStaticPaths() {
+  const entries = await getLocalized('projects', 'fil');
+  return entries.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+---
+
+<ProjectDetail lang="fil" {entry} />

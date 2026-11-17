@@ -1,0 +1,29 @@
+---
+import PillTag from '../ui/PillTag.astro';
+import Placeholder from '../ui/Placeholder.astro';
+
+/** Team member: photo, name, yellow role pill. */
+interface Props {
+  name: string;
+  role: string;
+  community?: string;
+  photo?: string;
+  class?: string;
+}
+const { name, role, community, photo, class: className } = Astro.props;
+---
+
+<article class:list={['flex flex-col gap-4', className]}>
+  <div class="relative aspect-square overflow-hidden rounded-card">
+    {photo ? (
+      <img src={photo} alt={name} class="h-full w-full object-cover" loading="lazy" />
+    ) : (
+      <Placeholder label={name} tone="yellow" class="h-full w-full" />
+    )}
+    <PillTag class="absolute bottom-4 left-4">{role}</PillTag>
+  </div>
+  <div>
+    <h3 class="text-xl">{name}</h3>
+    {community && <p class="font-mono text-sm text-muted">{community}</p>}
+  </div>
+</article>

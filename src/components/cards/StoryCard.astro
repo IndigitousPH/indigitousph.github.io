@@ -1,0 +1,80 @@
+---
+import PillTag from '../ui/PillTag.astro';
+import Placeholder from '../ui/Placeholder.astro';
+import Icon from '../ui/Icon.astro';
+
+/** Blog/news teaser: image, category, date, title, excerpt. */
+interface Props {
+  title: string;
+  href: string;
+  date: Date;
+  summary: string;
+  category?: string;
+  image?: string;
+  readMore?: string;
+  placeholder?: boolean;
+  placeholderLabel?: string;
+  lang?: string;
+  class?: string;
+}
+const {
+  title,
+  href,
+  date,
+  summary,
+  category,
+  image,
+  readMore = 'Read more',
+  placeholder = false,
+  placeholderLabel = 'Sample content',
+  lang = 'en-PH',
+  class: className,
+} = Astro.props;
+---
+
+<article class:list={['group relative flex h-full flex-col', className]}>
+  <div class="aspect-[4/3] overflow-hidden rounded-card">
+    {image ? (
+      <img
+        src={image}
+        alt=""
+        class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        loading="lazy"
+      />
+    ) : (
+      <Placeholder
+        label={title}
+        tone="ink"
+        class="h-full w-full transition duration-500 group-hover:scale-105"
+      />
+    )}
+  </div>
+  <div class="flex flex-1 flex-col gap-3 pt-5">
+    <div class="flex flex-wrap items-center gap-3 text-sm text-muted">
+      {category && <PillTag size="sm">{category}</PillTag>}
+      <time datetime={date.toISOString()} class="font-mono">
+        {date.toLocaleDateString(lang, {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          timeZone: 'Asia/Manila',
+        })}
+      </time>
+      {placeholder && (
+        <PillTag size="sm" tone="outline">
+          {placeholderLabel}
+        </PillTag>
+      )}
+    </div>
+    <h3 class="text-xl leading-snug">
+      <a href={href} class="after:absolute after:inset-0 group-hover:text-brand-orange-dark">
+        {title}
+      </a>
+    </h3>
+    <p class="line-clamp-3 text-muted">{summary}</p>
+    <span class="mt-auto inline-flex items-center gap-2 font-mono text-sm font-medium text-brand-orange-dark">
+      {readMore}
+      <Icon name="arrow-right" size={16} class="transition group-hover:translate-x-1" />
+    </span>
+  </div>
+</article>

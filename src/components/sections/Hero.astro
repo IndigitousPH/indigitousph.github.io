@@ -1,0 +1,66 @@
+---
+/**
+ * Home hero. Big headline with a highlighted phrase, intro, CTAs (via `actions` slot)
+ * and an optional visual on the right (`visual` slot), defaulting to a brand collage.
+ */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  /** Part of the title to highlight in yellow marker style. */
+  highlight?: string;
+  intro?: string;
+  class?: string;
+}
+const { eyebrow, title, highlight, intro, class: className } = Astro.props;
+const [before, after] =
+  highlight && title.includes(highlight) ? title.split(highlight) : [title, undefined];
+---
+
+<section class:list={['relative overflow-hidden bg-ink text-white', className]}>
+  <div
+    class="pointer-events-none absolute -top-40 -right-40 h-[32rem] w-[32rem] rounded-full bg-brand-gradient-soft opacity-60 blur-3xl"
+    aria-hidden="true"
+  ></div>
+  <div class="container-page relative grid items-center gap-12 py-20 md:py-28 lg:grid-cols-[1.2fr_1fr]">
+    <div class="flex flex-col gap-6">
+      {eyebrow && <p class="eyebrow text-brand-yellow">{eyebrow}</p>}
+      <h1 class="text-4xl leading-[1.2] sm:text-5xl lg:text-6xl">
+        {before}
+        {after !== undefined && (
+          <>
+            <span class="rounded-lg bg-brand-yellow px-[0.15em] text-ink box-decoration-clone">
+              {highlight}
+            </span>
+            {after}
+          </>
+        )}
+      </h1>
+      {intro && <p class="max-w-xl text-lg text-white/85 md:text-xl">{intro}</p>}
+      <div class="flex flex-wrap gap-3 pt-2">
+        <slot name="actions" />
+      </div>
+    </div>
+    <div class="relative">
+      <slot name="visual">
+        <div class="grid grid-cols-2 gap-4" aria-hidden="true">
+          <div class="flex aspect-square flex-col justify-end rounded-card bg-brand-gradient p-6 font-mono text-ink">
+            <span class="text-4xl font-bold">&lt;/&gt;</span>
+            <span class="text-sm">code</span>
+          </div>
+          <div class="mt-10 flex aspect-square flex-col justify-end rounded-card bg-brand-yellow p-6 font-mono text-ink">
+            <span class="text-4xl font-bold">✎</span>
+            <span class="text-sm">create</span>
+          </div>
+          <div class="-mt-10 flex aspect-square flex-col justify-end rounded-card bg-ink-2 p-6 font-mono text-brand-yellow ring-1 ring-white/10">
+            <span class="text-4xl font-bold">#</span>
+            <span class="text-sm">hack</span>
+          </div>
+          <div class="flex aspect-square flex-col justify-end rounded-card bg-white p-6 font-mono text-ink">
+            <span class="text-4xl font-bold">♥</span>
+            <span class="text-sm">reach</span>
+          </div>
+        </div>
+      </slot>
+    </div>
+  </div>
+</section>

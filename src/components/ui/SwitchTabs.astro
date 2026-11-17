@@ -1,0 +1,83 @@
+---
+/**
+ * Pill segmented control (the black active tab from indigitous.org).
+ * Pure links by default. With `filterGroup`, it becomes a client-side filter:
+ * items with `data-filter-group="<group>"` and `data-filter-tags="a b c"` are shown/hidden.
+ */
+interface Item {
+  label: string;
+  value: string;
+  href?: string;
+}
+interface Props {
+  items: Item[];
+  active?: string;
+  filterGroup?: string;
+  label?: string;
+  class?: string;
+}
+const {
+  items,
+  active = items[0]?.value,
+  filterGroup,
+  label = 'Filter',
+  class: className,
+} = Astro.props;
+---
+
+<div
+  class:list={['flex w-max max-w-full flex-wrap gap-1 rounded-pill bg-mist p-1', className]}
+  role={filterGroup ? 'group' : 'navigation'}
+  aria-label={label}
+  data-switch-tabs={filterGroup}
+>
+  {items.map((item) => {
+    const isActive = item.value === active;
+    const cls = [
+      'rounded-pill px-4 py-2 font-mono text-sm font-medium transition-colors',
+      isActive ? 'bg-ink text-white' : 'text-ink hover:bg-white',
+    ];
+    return item.href ? (
+      <a href={item.href} class:list={cls} aria-current={isActive ? 'page' : undefined}>
+        {item.label}
+      </a>
+    ) : (
+      <button
+        type="button"
+        class:list={cls}
+        data-value={item.value}
+        aria-pressed={isActive ? 'true' : 'false'}
+      >
+        {item.label}
+      </button>
+    );
+  })}
+</div>
+
+<script>
+  function initSwitchTabs() {
+    document.querySelectorAll<HTMLElement>('[data-switch-tabs]').forEach((group) => {
+      const name = group.dataset.switchTabs;
+      if (!name || group.dataset.ready) return;
+      group.dataset.ready = 'true';
+      const buttons = group.querySelectorAll<HTMLButtonElement>('button[data-value]');
+      const apply = (value: string) => {
+        buttons.forEach((b) => {
+          const on = b.dataset.value === value;
+          b.setAttribute('aria-pressed', String(on));
+          b.classList.toggle('bg-ink', on);
+          b.classList.toggle('text-white', on);
+          b.classList.toggle('hover:bg-white', !on);
+        });
+        document.querySelectorAll<HTMLElement>(`[data-filter-group="${name}"]`).forEach((el) => {
+          const tags = (el.dataset.filterTags ?? '').split(' ');
+          el.hidden = !(value === 'all' || tags.includes(value));
+        });
+      };
+      buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.value!)));
+      const initial = group.querySelector<HTMLButtonElement>('button[aria-pressed="true"]');
+      if (initial) apply(initial.dataset.value!);
+    });
+  }
+  initSwitchTabs();
+</script>

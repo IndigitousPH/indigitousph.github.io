@@ -1,0 +1,141 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/sections/PageHeader.astro';
+import Section from '@/components/sections/Section.astro';
+import Field from '@/components/ui/Field.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/config/site';
+import { pick, useTranslations, type Lang } from '@/i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT as string | undefined;
+const copy = pick(
+  {
+    en: {
+      title: 'Kumusta! Let’s talk',
+      intro:
+        'Want to join a community, host #HACK, partner with us or just say hi? Send us a message.',
+      interests: [
+        'Joining a community',
+        'Hosting #HACK',
+        'Volunteering on a project',
+        'Church or ministry partnership',
+        'Something else',
+      ],
+      noForm: 'The contact form is not set up yet. Reach us through these channels for now:',
+      elsewhere: 'Find us online',
+    },
+    fil: {
+      title: 'Kumusta! Mag-usap tayo',
+      intro:
+        'Gusto mo bang sumali sa komunidad, mag-host ng #HACK, makipag-partner o mag-hi lang? Mag-message sa amin.',
+      interests: [
+        'Pagsali sa komunidad',
+        'Pag-host ng #HACK',
+        'Pag-volunteer sa proyekto',
+        'Partnership ng simbahan o ministeryo',
+        'Iba pa',
+      ],
+      noForm: 'Hindi pa naka-set up ang contact form. Abutin muna kami sa mga channel na ito:',
+      elsewhere: 'Hanapin kami online',
+    },
+  },
+  lang,
+);
+---
+
+<BaseLayout {lang} title={t('nav.contact')} description={copy.intro}>
+  <PageHeader eyebrow={t('nav.contact')} title={copy.title} intro={copy.intro} />
+  <Section>
+    <div class="grid gap-12 lg:grid-cols-[1.5fr_1fr]">
+      {endpoint ? (
+        <form action={endpoint} method="post" class="flex flex-col gap-5">
+          <div class="grid gap-5 sm:grid-cols-2">
+            <Field label={t('form.name')} name="name" required />
+            <Field label={t('form.email')} name="email" type="email" required />
+          </div>
+          <div class="grid gap-5 sm:grid-cols-2">
+            <Field label={t('form.city')} name="city" />
+            <Field
+              label={t('form.interest')}
+              name="interest"
+              as="select"
+              options={copy.interests}
+            />
+          </div>
+          <Field label={t('form.message')} name="message" as="textarea" required />
+          <Button type="submit" size="lg" icon="arrow-right" class="w-max">
+            {t('cta.send')}
+          </Button>
+        </form>
+      ) : (
+        <div class="rounded-card bg-mist p-8">
+          <p class="text-lg">{copy.noForm}</p>
+          <ul class="mt-6 flex flex-col gap-3">
+            {site.contactEmail && (
+              <li>
+                <a
+                  href={`mailto:${site.contactEmail}`}
+                  class="inline-flex items-center gap-2 font-medium text-brand-orange-dark underline"
+                >
+                  <Icon name="mail" />
+                  {site.contactEmail}
+                </a>
+              </li>
+            )}
+            <li>
+              <a
+                href={site.whatsappChannel}
+                class="inline-flex items-center gap-2 font-medium text-brand-orange-dark underline"
+              >
+                <Icon name="whatsapp" />
+                WhatsApp
+              </a>
+            </li>
+            <li>
+              <a
+                href={site.socials[0].href}
+                class="inline-flex items-center gap-2 font-medium text-brand-orange-dark underline"
+              >
+                <Icon name="facebook" />
+                Facebook / Messenger
+              </a>
+            </li>
+          </ul>
+        </div>
+      )}
+      <aside class="flex flex-col gap-4">
+        <h2 class="eyebrow text-brand-orange-dark">{copy.elsewhere}</h2>
+        <ul class="flex flex-col gap-3">
+          {site.socials.map((s) => (
+            <li>
+              <a
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-3 rounded-pill bg-mist px-5 py-3 font-medium hover:bg-brand-yellow"
+              >
+                <Icon name={s.icon} /> {s.label}
+              </a>
+            </li>
+          ))}
+          <li>
+            <a
+              href={site.whatsappChannel}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center gap-3 rounded-pill bg-mist px-5 py-3 font-medium hover:bg-brand-yellow"
+            >
+              <Icon name="whatsapp" /> WhatsApp channel
+            </a>
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </Section>
+</BaseLayout>

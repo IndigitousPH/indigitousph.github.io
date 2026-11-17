@@ -1,0 +1,90 @@
+---
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import { site } from '@/config/site';
+
+/**
+ * Newsletter signup on an orange band. Posts to PUBLIC_NEWSLETTER_ENDPOINT when set;
+ * otherwise shows only the WhatsApp / social links.
+ */
+interface Props {
+  title: string;
+  body: string;
+  altLabel: string;
+  labels: { firstName: string; email: string; subscribe: string };
+  endpoint?: string;
+  class?: string;
+}
+const {
+  title,
+  body,
+  altLabel,
+  labels,
+  endpoint = import.meta.env.PUBLIC_NEWSLETTER_ENDPOINT,
+  class: className,
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    'overflow-hidden rounded-card bg-brand-orange-dark px-6 py-12 text-white md:px-14 md:py-16',
+    className,
+  ]}
+>
+  <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
+    <div class="flex flex-col gap-4">
+      <h2 class="text-3xl md:text-4xl">{title}</h2>
+      <p class="text-lg text-white/90">{body}</p>
+    </div>
+    <div class="flex flex-col gap-6">
+      {endpoint && (
+        <form action={endpoint} method="post" class="flex flex-col gap-3 sm:flex-row">
+          <label class="sr-only" for="nl-name">
+            {labels.firstName}
+          </label>
+          <input
+            id="nl-name"
+            name="firstName"
+            placeholder={labels.firstName}
+            class="w-full rounded-pill border border-white/80 bg-transparent px-6 py-3.5 text-white placeholder:text-white/75 focus:ring-2 focus:ring-white focus:outline-none"
+          />
+          <label class="sr-only" for="nl-email">
+            {labels.email}
+          </label>
+          <input
+            id="nl-email"
+            name="email"
+            type="email"
+            required
+            placeholder={labels.email}
+            class="w-full rounded-pill border border-white/80 bg-transparent px-6 py-3.5 text-white placeholder:text-white/75 focus:ring-2 focus:ring-white focus:outline-none"
+          />
+          <Button type="submit" variant="light">
+            {labels.subscribe}
+          </Button>
+        </form>
+      )}
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="font-mono text-sm text-white/90">{altLabel}</span>
+        <a
+          href={site.whatsappChannel}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-pill bg-white px-4 py-2 font-mono text-sm font-medium text-ink hover:bg-brand-yellow"
+        >
+          <Icon name="whatsapp" size={18} /> WhatsApp
+        </a>
+        {site.socials.slice(0, 2).map((s) => (
+          <a
+            href={s.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 rounded-pill bg-white px-4 py-2 font-mono text-sm font-medium text-ink hover:bg-brand-yellow"
+          >
+            <Icon name={s.icon} size={18} /> {s.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>

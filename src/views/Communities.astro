@@ -1,0 +1,75 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/sections/PageHeader.astro';
+import Section from '@/components/sections/Section.astro';
+import CardGrid from '@/components/sections/CardGrid.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import CommunityCard from '@/components/cards/CommunityCard.astro';
+import Button from '@/components/ui/Button.astro';
+import { site } from '@/config/site';
+import { localizePath, pick, useTranslations, type Lang } from '@/i18n';
+import { byOrder, getLocalized } from '@/lib/content';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const copy = pick(
+  {
+    en: {
+      title: 'Find your people',
+      intro:
+        'Indigitous communities gather tech and creative followers of Jesus to learn, build and pray together.',
+      ctaTitle: 'No community near you?',
+      ctaBody: 'Start one! We will help you gather people in your city, campus or church.',
+      start: 'Start a community',
+      global: 'Communities worldwide',
+    },
+    fil: {
+      title: 'Hanapin ang iyong mga kasama',
+      intro:
+        'Tinitipon ng mga komunidad ng Indigitous ang mga tech at creative na tagasunod ni Hesus para matuto, bumuo at manalangin nang sama-sama.',
+      ctaTitle: 'Walang komunidad na malapit sa iyo?',
+      ctaBody:
+        'Magsimula ng isa! Tutulungan ka naming tipunin ang mga tao sa inyong lungsod, kampus o simbahan.',
+      start: 'Magsimula ng komunidad',
+      global: 'Mga komunidad sa buong mundo',
+    },
+  },
+  lang,
+);
+const communities = (await getLocalized('communities', lang)).sort(byOrder);
+---
+
+<BaseLayout {lang} title={t('nav.communities')} description={copy.intro}>
+  <PageHeader eyebrow={t('nav.communities')} title={copy.title} intro={copy.intro} />
+  <Section>
+    <CardGrid cols={3}>
+      {communities.map((c) => (
+        <CommunityCard
+          name={c.data.name}
+          region={c.data.region}
+          summary={c.data.summary}
+          image={c.data.image}
+          href={localizePath(`/communities/${c.slug}`, lang)}
+        />
+      ))}
+    </CardGrid>
+  </Section>
+  <Section class="pt-0!">
+    <CtaBand tone="yellow" title={copy.ctaTitle} body={copy.ctaBody}>
+      <Button href={localizePath('/contact', lang)} variant="dark" icon="arrow-right">
+        {copy.start}
+      </Button>
+      <Button
+        href={`${site.global.home}/connect/`}
+        variant="outline"
+        external
+        icon="arrow-up-right"
+      >
+        {copy.global}
+      </Button>
+    </CtaBand>
+  </Section>
+</BaseLayout>

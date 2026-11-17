@@ -1,0 +1,46 @@
+---
+/** Inner-page header: eyebrow, title, intro and optional actions. */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  intro?: string;
+  tone?: 'mist' | 'ink' | 'gradient';
+  class?: string;
+}
+const { eyebrow, title, intro, tone = 'mist', class: className } = Astro.props;
+const tones = {
+  mist: 'bg-mist text-ink',
+  ink: 'bg-ink text-white',
+  gradient: 'bg-brand-gradient text-ink',
+};
+---
+
+<header class:list={['relative overflow-hidden', tones[tone], className]}>
+  <div class="container-page flex flex-col gap-5 py-16 md:py-24">
+    {eyebrow && (
+      <p
+        class:list={[
+          'eyebrow',
+          tone === 'ink' ? 'text-brand-yellow' : 'text-brand-orange-dark',
+          tone === 'gradient' && 'text-ink!',
+        ]}
+      >
+        {eyebrow}
+      </p>
+    )}
+    <h1 class="max-w-4xl text-4xl leading-tight sm:text-5xl lg:text-6xl">{title}</h1>
+    {intro && (
+      <p
+        class:list={[
+          'max-w-2xl text-lg md:text-xl',
+          tone === 'ink' ? 'text-white/85' : 'text-ink-2',
+        ]}
+      >
+        {intro}
+      </p>
+    )}
+    <div class="flex flex-wrap gap-3 empty:hidden">
+      <slot />
+    </div>
+  </div>
+</header>

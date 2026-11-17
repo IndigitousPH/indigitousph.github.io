@@ -1,0 +1,83 @@
+---
+import Icon from '../ui/Icon.astro';
+import PillTag from '../ui/PillTag.astro';
+import Placeholder from '../ui/Placeholder.astro';
+
+/** Event teaser: date block, title, location, link. */
+interface Props {
+  title: string;
+  href: string;
+  date: Date;
+  location: string;
+  summary?: string;
+  image?: string;
+  online?: boolean;
+  /** Pre-formatted labels so the card stays language-agnostic. */
+  labels?: { event?: string; online?: string; placeholder?: string };
+  placeholder?: boolean;
+  lang?: string;
+  class?: string;
+}
+const {
+  title,
+  href,
+  date,
+  location,
+  summary,
+  image,
+  online = false,
+  labels = {},
+  placeholder = false,
+  lang = 'en-PH',
+  class: className,
+} = Astro.props;
+const fmt = (o: Intl.DateTimeFormatOptions) =>
+  date.toLocaleDateString(lang, { timeZone: 'Asia/Manila', ...o });
+---
+
+<article
+  class:list={[
+    'group relative flex h-full flex-col overflow-hidden rounded-card bg-white ring-1 ring-stone transition hover:-translate-y-1 hover:shadow-xl',
+    className,
+  ]}
+>
+  <div class="relative aspect-[16/9]">
+    {image ? (
+      <img src={image} alt="" class="h-full w-full object-cover" loading="lazy" />
+    ) : (
+      <Placeholder icon="calendar" class="h-full w-full" />
+    )}
+    <time
+      datetime={date.toISOString()}
+      class="absolute top-4 left-4 flex flex-col items-center rounded-tile bg-white px-3 py-2 text-ink shadow"
+    >
+      <span class="eyebrow text-brand-orange-dark">{fmt({ month: 'short' })}</span>
+      <span class="text-2xl leading-none font-bold">{fmt({ day: 'numeric' })}</span>
+    </time>
+  </div>
+  <div class="flex flex-1 flex-col gap-3 p-6">
+    <div class="flex flex-wrap gap-2">
+      <PillTag size="sm">{labels.event ?? 'Event'}</PillTag>
+      {online && (
+        <PillTag size="sm" tone="mist">
+          {labels.online ?? 'Online'}
+        </PillTag>
+      )}
+      {placeholder && (
+        <PillTag size="sm" tone="outline">
+          {labels.placeholder ?? 'Sample content'}
+        </PillTag>
+      )}
+    </div>
+    <h3 class="text-xl leading-snug">
+      <a href={href} class="after:absolute after:inset-0 group-hover:text-brand-orange-dark">
+        {title}
+      </a>
+    </h3>
+    {summary && <p class="line-clamp-3 text-muted">{summary}</p>}
+    <p class="mt-auto flex items-center gap-2 pt-2 text-sm text-ink-2">
+      <Icon name="map-pin" size={16} />
+      {location}
+    </p>
+  </div>
+</article>

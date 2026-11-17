@@ -1,0 +1,43 @@
+---
+/** Row of big numbers. */
+interface Props {
+  stats: { value: string; label: string }[];
+  tone?: 'ink' | 'yellow' | 'white';
+  caption?: string;
+  class?: string;
+}
+const { stats, tone = 'ink', caption, class: className } = Astro.props;
+const tones = {
+  ink: 'bg-ink text-white',
+  yellow: 'bg-brand-yellow text-ink',
+  white: 'bg-white text-ink ring-1 ring-stone',
+};
+---
+
+<div class:list={['rounded-card px-6 py-10 md:px-12', tones[tone], className]}>
+  <dl class="grid grid-cols-2 gap-8 md:grid-cols-4">
+    {stats.map((s) => (
+      <div class="flex flex-col gap-1">
+        <dt
+          class:list={[
+            'order-2 font-mono text-sm',
+            tone === 'ink' ? 'text-white/75' : 'text-ink-2',
+          ]}
+        >
+          {s.label}
+        </dt>
+        <dd
+          class:list={[
+            'order-1 text-4xl font-bold md:text-5xl',
+            tone === 'ink' && 'text-brand-yellow',
+          ]}
+        >
+          {s.value}
+        </dd>
+      </div>
+    ))}
+  </dl>
+  {caption && (
+    <p class:list={['mt-8 text-sm', tone === 'ink' ? 'text-white/60' : 'text-muted']}>{caption}</p>
+  )}
+</div>

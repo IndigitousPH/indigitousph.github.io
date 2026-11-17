@@ -1,0 +1,63 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/sections/PageHeader.astro';
+import Section from '@/components/sections/Section.astro';
+import CardGrid from '@/components/sections/CardGrid.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import TeamCard from '@/components/cards/TeamCard.astro';
+import Button from '@/components/ui/Button.astro';
+import { localizePath, pick, useTranslations, type Lang } from '@/i18n';
+import { byOrder, getLocalized } from '@/lib/content';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const copy = pick(
+  {
+    en: {
+      title: 'The people behind Indigitous PH',
+      intro: 'Volunteers and staff who love Jesus, love the Philippines and love building things.',
+      note: 'Team profiles below are sample content until real profiles are added.',
+      ctaTitle: 'Want to serve with us?',
+      ctaBody: 'We are always looking for Champions, community leads and volunteers.',
+    },
+    fil: {
+      title: 'Ang mga tao sa likod ng Indigitous PH',
+      intro:
+        'Mga volunteer at staff na nagmamahal kay Hesus, sa Pilipinas, at sa pagbuo ng mga bagay.',
+      note: 'Halimbawang nilalaman lamang ang mga profile sa ibaba hanggang mailagay ang totoong mga profile.',
+      ctaTitle: 'Gusto mo bang maglingkod kasama namin?',
+      ctaBody: 'Lagi kaming naghahanap ng mga Champion, community lead at volunteer.',
+    },
+  },
+  lang,
+);
+const team = (await getLocalized('team', lang)).sort(byOrder);
+const hasPlaceholders = team.some((m) => m.data.placeholder);
+---
+
+<BaseLayout {lang} title={t('nav.team')} description={copy.intro}>
+  <PageHeader eyebrow={t('nav.team')} title={copy.title} intro={copy.intro} />
+  <Section>
+    {hasPlaceholders && <p class="mb-8 font-mono text-sm text-muted">{copy.note}</p>}
+    <CardGrid cols={3}>
+      {team.map((m) => (
+        <TeamCard
+          name={m.data.name}
+          role={m.data.role}
+          community={m.data.community}
+          photo={m.data.photo}
+        />
+      ))}
+    </CardGrid>
+  </Section>
+  <Section class="pt-0!">
+    <CtaBand tone="yellow" title={copy.ctaTitle} body={copy.ctaBody}>
+      <Button href={localizePath('/get-involved', lang)} variant="dark" icon="arrow-right">
+        {t('nav.getInvolved')}
+      </Button>
+    </CtaBand>
+  </Section>
+</BaseLayout>
