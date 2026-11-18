@@ -1,0 +1,53 @@
+---
+/** Inner-page banner (deck: PageHero, reused on every inner page): headline, one line, soft photo. */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  intro?: string;
+  image?: string;
+  /** mist = default, calm = quiet (Pray), ink = dark, gradient = brand. */
+  tone?: 'mist' | 'calm' | 'ink' | 'gradient';
+  class?: string;
+}
+const { eyebrow, title, intro, image, tone = 'mist', class: className } = Astro.props;
+const tones = {
+  mist: 'bg-mist text-ink',
+  calm: 'bg-white text-ink border-b border-stone',
+  ink: 'bg-ink text-white',
+  gradient: 'bg-brand-gradient text-ink',
+};
+const dark = tone === 'ink';
+---
+
+<header class:list={['relative isolate overflow-hidden', tones[tone], className]}>
+  {image && (
+    <>
+      <img src={image} alt="" class="absolute inset-0 -z-10 h-full w-full object-cover" />
+      <div
+        class:list={['absolute inset-0 -z-10', dark ? 'bg-ink/75' : 'bg-white/80']}
+        aria-hidden="true"
+      />
+    </>
+  )}
+  <div class="container-page flex flex-col gap-5 py-16 md:py-24">
+    {eyebrow && (
+      <p
+        class:list={[
+          'eyebrow',
+          dark ? 'text-brand-yellow' : tone === 'gradient' ? 'text-ink' : 'text-brand-orange-dark',
+        ]}
+      >
+        {eyebrow}
+      </p>
+    )}
+    <h1 class="max-w-4xl text-4xl leading-tight sm:text-5xl lg:text-6xl">{title}</h1>
+    {intro && (
+      <p class:list={['max-w-2xl text-lg md:text-xl', dark ? 'text-white/85' : 'text-ink-2']}>
+        {intro}
+      </p>
+    )}
+    <div class="flex flex-wrap gap-3 empty:hidden">
+      <slot />
+    </div>
+  </div>
+</header>

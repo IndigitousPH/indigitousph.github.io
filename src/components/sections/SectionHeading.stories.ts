@@ -16,7 +16,7 @@ export default {
     },
     {
       name: 'Center',
-      props: { align: 'center', eyebrow: 'Our community', title: 'Find your people' },
+      props: { align: 'center', eyebrow: 'Local Networks', title: 'Find your people.' },
     },
     {
       name: 'Light',

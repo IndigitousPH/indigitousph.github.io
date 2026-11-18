@@ -1,0 +1,125 @@
+---
+/** Pray & Online Workers: for people who want to pray, and believers who already share the gospel online. */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Section from '@/components/sections/Section.astro';
+import SectionHeading from '@/components/sections/SectionHeading.astro';
+import EventDetails from '@/components/sections/EventDetails.astro';
+import SplitText from '@/components/sections/SplitText.astro';
+import PrayerFocus from '@/components/sections/PrayerFocus.astro';
+import PrayerForm from '@/components/forms/PrayerForm.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { getSite } from '@/lib/content';
+
+const prayer = await getSite('prayer');
+const focus = await getSite('prayerFocus');
+const scheduled = Boolean(prayer.day && prayer.time);
+const when = scheduled
+  ? `${prayer.day} · ${prayer.time} (Manila time)`
+  : 'Day and time coming soon';
+
+const copy = {
+  hero: {
+    title: 'Every conversation online starts in prayer.',
+    intro: 'Join a community that prays for the people we reach and the believers who reach them.',
+  },
+  prayerTime: {
+    title: 'Pray with us',
+    body: `${scheduled ? prayer.day : 'Every week'}, we gather online to pray for the Philippines, for our local networks, and for people who are meeting Jesus through a chat, a post or a video.`,
+  },
+  workers: {
+    title: 'You share Jesus online. You shouldn’t do it alone.',
+    body: 'Many believers answer questions about faith in comment sections, chat with seekers, or run ministry pages, often late at night and often unseen. Our online workers ministry is a place to be encouraged, trained and prayed for.',
+    // TODO(content): confirm the rhythm (huddles or check-ins).
+    bullets: [
+      'Regular huddles and check-ins',
+      'Practical training on online conversations',
+      'A prayer team that knows your name',
+    ],
+    cta: 'Join the online workers ministry',
+  },
+  request: { title: 'How can we pray for you?' },
+};
+---
+
+<BaseLayout title="Pray & Online Workers" description={copy.hero.intro}>
+  <PageHero tone="calm" eyebrow="Pray" title={copy.hero.title} intro={copy.hero.intro} />
+
+  <Section tone="mist">
+    <EventDetails
+      title={copy.prayerTime.title}
+      body={copy.prayerTime.body}
+      rows={[
+        { label: 'When', value: when, icon: 'clock' },
+        {
+          label: 'Where',
+          value: prayer.platform ?? 'Online (link shared when you join)',
+          icon: 'globe',
+        },
+        { label: 'Who', value: 'Anyone who wants to pray', icon: 'users' },
+      ]}
+    >
+      {prayer.link ? (
+        <Button href={prayer.link} external icon="arrow-up-right">
+          Join the prayer time
+        </Button>
+      ) : (
+        <Button href="/contact" icon="arrow-right">
+          Ask us for the prayer link
+        </Button>
+      )}
+      {scheduled && prayer.weekday && (
+        <a
+          href="/pray/prayer-time.ics"
+          download
+          class="inline-flex items-center gap-2 font-mono text-sm font-medium text-brand-orange-dark underline underline-offset-4"
+        >
+          <Icon name="calendar-plus" size={16} />
+          Add it to my calendar
+        </a>
+      )}
+    </EventDetails>
+  </Section>
+
+  <Section>
+    <SplitText title={copy.workers.title} body={copy.workers.body}>
+      <Placeholder
+        slot="media"
+        icon="message"
+        tone="yellow"
+        class="aspect-[4/3] w-full rounded-card"
+      />
+      <ul class="flex flex-col gap-3">
+        {copy.workers.bullets.map((b) => (
+          <li class="flex items-start gap-3 text-lg">
+            <span class="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-yellow">
+              <Icon name="check" size={14} />
+            </span>
+            {b}
+          </li>
+        ))}
+      </ul>
+      <Button
+        href="/networks#connect"
+        variant="dark"
+        icon="arrow-right"
+        class="self-start max-w-full"
+      >
+        {copy.workers.cta}
+      </Button>
+    </SplitText>
+  </Section>
+
+  <Section tone="mist" id="request">
+    <div class="mx-auto max-w-2xl">
+      <SectionHeading title={copy.request.title} />
+      <PrayerForm />
+    </div>
+  </Section>
+
+  <Section>
+    <PrayerFocus title="Praying this month" points={focus.points} guideHref={focus.guidePdf} />
+  </Section>
+</BaseLayout>

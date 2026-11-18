@@ -1,0 +1,47 @@
+---
+/** Checkbox or radio group shown as pill toggles (e.g. "How would you like to serve?"). */
+interface Props {
+  legend: string;
+  name: string;
+  options: string[];
+  type?: 'checkbox' | 'radio';
+  /** Pre-selected value (radio) or values (checkbox). */
+  checked?: string | string[];
+  required?: boolean;
+  class?: string;
+}
+const {
+  legend,
+  name,
+  options,
+  type = 'checkbox',
+  checked = [],
+  required = false,
+  class: className,
+} = Astro.props;
+const isChecked = (o: string) => (Array.isArray(checked) ? checked.includes(o) : checked === o);
+---
+
+<fieldset class:list={['flex flex-col gap-3', className]}>
+  <legend class="eyebrow mb-3 text-ink">
+    {legend}
+    {required && <span aria-hidden="true"> *</span>}
+  </legend>
+  <div class="flex flex-wrap gap-2">
+    {options.map((o) => (
+      <label class="cursor-pointer">
+        <input
+          type={type}
+          name={name}
+          value={o}
+          checked={isChecked(o)}
+          required={required && type === 'radio'}
+          class="peer sr-only"
+        />
+        <span class="inline-flex items-center rounded-pill bg-mist px-4 py-2 text-sm font-medium transition peer-checked:bg-ink peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-brand-orange hover:bg-stone">
+          {o}
+        </span>
+      </label>
+    ))}
+  </div>
+</fieldset>

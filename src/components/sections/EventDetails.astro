@@ -1,0 +1,53 @@
+---
+import Icon, { type IconName } from '../ui/Icon.astro';
+
+/**
+ * Details list (deck: EventDetails), reused for #HACK and the prayer time.
+ * Optional `mapEmbed` (Google Maps embed URL) or the `aside` slot fills the right column.
+ * Buttons go in the default slot.
+ */
+interface Props {
+  title?: string;
+  body?: string;
+  rows: { label: string; value: string; icon?: IconName }[];
+  mapEmbed?: string;
+  mapTitle?: string;
+  class?: string;
+}
+const { title, body, rows, mapEmbed, mapTitle = 'Venue map', class: className } = Astro.props;
+const hasAside = Boolean(mapEmbed) || Astro.slots.has('aside');
+---
+
+<div class:list={['grid gap-10', hasAside && 'lg:grid-cols-2', className]}>
+  <div class="flex flex-col gap-6">
+    {title && <h2 class="text-3xl md:text-4xl">{title}</h2>}
+    {body && <p class="max-w-2xl text-lg text-ink-2">{body}</p>}
+    <dl class="divide-y divide-stone overflow-hidden rounded-card bg-white ring-1 ring-stone">
+      {rows.map((row) => (
+        <div class="grid grid-cols-[7rem_1fr] gap-4 px-6 py-4 sm:grid-cols-[9rem_1fr]">
+          <dt class="eyebrow flex items-center gap-2 text-muted">
+            {row.icon && <Icon name={row.icon} size={16} />}
+            {row.label}
+          </dt>
+          <dd class="font-medium">{row.value}</dd>
+        </div>
+      ))}
+    </dl>
+    <div class="flex flex-wrap items-center gap-4 empty:hidden">
+      <slot />
+    </div>
+  </div>
+  {hasAside && (
+    <div>
+      <slot name="aside">
+        <iframe
+          src={mapEmbed}
+          title={mapTitle}
+          class="aspect-square w-full rounded-card border-0 lg:aspect-auto lg:h-full"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        />
+      </slot>
+    </div>
+  )}
+</div>

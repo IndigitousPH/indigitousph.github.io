@@ -1,0 +1,54 @@
+---
+import FormShell from './FormShell.astro';
+import Field from '../ui/Field.astro';
+import Choices from '../ui/Choices.astro';
+import { forms } from '@/config/site';
+
+/** "How can we pray for you?" (deck: PrayerForm). Goes to a private prayer-team inbox. */
+interface Props {
+  endpoint?: string;
+  class?: string;
+}
+const { endpoint = forms.prayer, class: className } = Astro.props;
+---
+
+<FormShell
+  endpoint={endpoint}
+  formName="prayer-request"
+  submitLabel="Send my request"
+  success="Thank you. We’re praying with you."
+  note="Your request is kept private and shared only with our prayer team."
+  class={className}
+>
+  <Field label="First name (optional)" name="firstName" id="pr-first" />
+  <Field label="Prayer request" name="request" as="textarea" id="pr-request" required />
+  <Choices
+    legend="May we contact you?"
+    name="contact"
+    type="radio"
+    options={['Yes', 'No']}
+    checked="No"
+  />
+  <div data-contact-email hidden>
+    <Field label="Email" name="email" type="email" id="pr-email" />
+  </div>
+</FormShell>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('form').forEach((form) => {
+    const box = form.querySelector<HTMLElement>('[data-contact-email]');
+    if (!box) return;
+    const input = box.querySelector('input');
+    const sync = () => {
+      const yes =
+        form.querySelector<HTMLInputElement>('input[name="contact"][value="Yes"]')?.checked ??
+        false;
+      box.hidden = !yes;
+      if (input) input.required = yes;
+    };
+    form
+      .querySelectorAll('input[name="contact"]')
+      .forEach((r) => r.addEventListener('change', sync));
+    sync();
+  });
+</script>

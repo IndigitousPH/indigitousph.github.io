@@ -1,0 +1,22 @@
+[
+  {
+    "id": "announcement",
+    "enabled": true,
+    "text": "#HACK for Christmas is happening in Iloilo, Nov 20–21.",
+    "linkText": "Save your seat",
+    "href": "https://ndgt.us/iloilo-hack",
+    "endDate": "2026-11-21T17:00:00+08:00"
+  },
+  {
+    "id": "prayer",
+    "durationMinutes": 60
+  },
+  {
+    "id": "prayerFocus",
+    "points": [
+      "Pray for the teams at #HACK for Christmas in Iloilo, that what they build would point people to Jesus.",
+      "Pray for Filipino believers who share their faith online, often late at night and unseen.",
+      "Pray for friends who are asking big questions about life and faith in chats, comments and searches."
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+---
+/** Numbered steps (deck: How it works). Horizontal on desktop, vertical on mobile. */
+interface Props {
+  items: { title: string; body: string }[];
+  class?: string;
+}
+const { items, class: className } = Astro.props;
+---
+
+<ol class:list={['grid gap-6 md:grid-cols-2 lg:grid-cols-4', className]}>
+  {items.map((item, i) => (
+    <li class="flex flex-col gap-3 rounded-card bg-white p-7 ring-1 ring-stone">
+      <span class="flex h-12 w-12 items-center justify-center rounded-full bg-ink font-mono text-xl font-bold text-brand-yellow">
+        {i + 1}
+      </span>
+      <h3 class="text-xl">{item.title}</h3>
+      <p class="text-muted">{item.body}</p>
+    </li>
+  ))}
+</ol>

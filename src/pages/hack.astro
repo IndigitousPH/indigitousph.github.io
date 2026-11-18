@@ -1,5 +1,163 @@
 ---
-import Hack from '@/views/Hack.astro';
+/** #HACK: the page most shared with youth and students. Plain words, registering one tap away. */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import EventHero from '@/components/sections/EventHero.astro';
+import Section from '@/components/sections/Section.astro';
+import SectionHeading from '@/components/sections/SectionHeading.astro';
+import SplitText from '@/components/sections/SplitText.astro';
+import Steps from '@/components/sections/Steps.astro';
+import EventDetails from '@/components/sections/EventDetails.astro';
+import ChallengeCards from '@/components/sections/ChallengeCards.astro';
+import Gallery from '@/components/sections/Gallery.astro';
+import Accordion from '@/components/sections/Accordion.astro';
+import CTABand from '@/components/sections/CTABand.astro';
+import Button from '@/components/ui/Button.astro';
+import { site } from '@/config/site';
+import { formatRange } from '@/i18n';
+import { getAll, getFeaturedEvent } from '@/lib/content';
+
+const copy = {
+  hero: {
+    eyebrow: 'Indigitous #HACK',
+    title: 'Build something that points people to Jesus.',
+    intro:
+      'A creative sprint where believers team up to turn ideas into apps, videos, campaigns, art and content for missions in a digital age.',
+  },
+  what: {
+    title: 'Not just for coders.',
+    body: 'A “hack” is a short, focused sprint. You join a team, pick a real challenge from a church or ministry, and build a solution in 24 hours, with mentors, food, worship and a lot of laughter along the way. Designers, writers, musicians, video makers, organizers and developers all have a seat at the table.',
+  },
+  steps: [
+    { title: 'Register', body: 'Sign up solo or with friends.' },
+    { title: 'Pick a challenge', body: 'Real needs from churches and ministries.' },
+    { title: 'Build', body: '24 hours with your team and mentors.' },
+    { title: 'Share', body: 'Present your project and keep it going after.' },
+  ],
+  past: {
+    title: '#HACK in the Philippines',
+    // TODO(content): add photos (public/images/hack/...) and other years and cities.
+    items: [{ caption: '2019 — Iloilo' }, { caption: '2026 — #HACK for Christmas, Iloilo' }],
+  },
+  // TODO(content): confirm the last three answers and add "Do I need to stay the whole 24 hours?"
+  faq: [
+    {
+      q: 'Do I need to know how to code?',
+      a: 'No. Most teams need designers, writers, video makers and organizers as much as developers.',
+    },
+    { q: 'Can I come without a team?', a: 'Yes. We’ll help you find one on the first night.' },
+    {
+      q: 'Is it only for church members?',
+      a: 'Everyone curious is welcome. The event includes times of worship and prayer.',
+    },
+    {
+      q: 'What happens to our project after?',
+      a: 'Some teams keep building with a ministry partner after the event.',
+    },
+  ],
+  host: { title: 'Want to host a #HACK in your city or church?' },
+};
+
+const event = await getFeaturedEvent();
+const challenges = (await getAll('challenges')).map((c) => c.data);
+const rows = event
+  ? [
+      { label: 'Event', value: event.data.title, icon: 'sparkles' as const },
+      {
+        label: 'When',
+        value: formatRange(event.data.date, event.data.endDate),
+        icon: 'calendar' as const,
+      },
+      { label: 'Where', value: event.data.venue, icon: 'map-pin' as const },
+      ...(event.data.fee ? [{ label: 'Fee', value: event.data.fee, icon: 'ticket' as const }] : []),
+      { label: 'Who', value: event.data.who ?? 'All skill levels', icon: 'users' as const },
+      ...(event.data.bring
+        ? [{ label: 'Bring', value: event.data.bring, icon: 'backpack' as const }]
+        : []),
+    ]
+  : [];
 ---
 
-<Hack lang="en" />
+<BaseLayout title="#HACK" description={copy.hero.intro}>
+  <EventHero
+    eyebrow={copy.hero.eyebrow}
+    title={copy.hero.title}
+    intro={copy.hero.intro}
+    image={event?.data.image}
+    countdownTo={event?.data.date}
+    countdownEnd={event?.data.endDate}
+    countdownLabel={event ? `To ${event.data.title}` : undefined}
+  >
+    {event?.data.registerUrl ? (
+      <Button
+        href={event.data.registerUrl}
+        size="lg"
+        external
+        icon="arrow-up-right"
+        data-hide-after={event.data.endDate.toISOString()}
+      >
+        {event.data.registerLabel ?? 'Register now'}
+      </Button>
+    ) : (
+      <Button href={site.global.hack} size="lg" external icon="arrow-up-right">
+        #HACK around the world
+      </Button>
+    )}
+  </EventHero>
+
+  <Section>
+    <SplitText title={copy.what.title} body={copy.what.body} />
+  </Section>
+
+  <Section tone="mist">
+    <SectionHeading title="How it works" />
+    <Steps items={copy.steps} />
+  </Section>
+
+  {event && (
+    <Section hideAfter={event.data.endDate}>
+      <EventDetails
+        title="Coming up"
+        rows={rows}
+        mapEmbed={event.data.mapEmbed}
+        mapTitle={`Map to ${event.data.venue}`}
+      >
+        {event.data.registerUrl && (
+          <Button href={event.data.registerUrl} external icon="arrow-up-right">
+            {event.data.registerLabel ?? 'Register now'}
+          </Button>
+        )}
+      </EventDetails>
+    </Section>
+  )}
+
+  <Section tone={event ? 'mist' : 'white'}>
+    <SectionHeading
+      title="Challenges"
+      intro="Real needs shared by churches and ministries. Pick one with your team."
+    />
+    <ChallengeCards challenges={challenges} />
+  </Section>
+
+  <Section tone={event ? 'white' : 'mist'}>
+    <SectionHeading title={copy.past.title} />
+    <Gallery items={copy.past.items} />
+  </Section>
+
+  <Section tone={event ? 'mist' : 'white'}>
+    <div class="grid gap-10 lg:grid-cols-[1fr_1.5fr]">
+      <SectionHeading title="Questions" class="mb-0" />
+      <Accordion items={copy.faq} />
+    </div>
+  </Section>
+
+  <Section>
+    <CTABand tone="ink" title={copy.host.title}>
+      <Button href="/contact" variant="light">
+        Host a #HACK
+      </Button>
+      <Button href="/partner" variant="outline-light">
+        Share a challenge
+      </Button>
+    </CTABand>
+  </Section>
+</BaseLayout>

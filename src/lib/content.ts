@@ -1,27 +1,10 @@
-import { getCollection, type CollectionEntry, type CollectionKey } from 'astro:content';
-import type { Lang } from '@/i18n';
+import { getCollection, getEntry, type CollectionEntry, type CollectionKey } from 'astro:content';
 
-export type Localized<C extends CollectionKey> = CollectionEntry<C> & { slug: string };
+export type Entry<C extends CollectionKey> = CollectionEntry<C>;
 
-/**
- * Entries for a language. English is the source of truth; a Filipino file with the
- * same slug replaces it on /fil pages, otherwise the English entry is used.
- */
-export async function getLocalized<C extends CollectionKey>(
-  collection: C,
-  lang: Lang,
-): Promise<Localized<C>[]> {
-  const all = (await getCollection(collection)) as CollectionEntry<C>[];
-  const bySlug = new Map<string, Localized<C>>();
-  for (const pass of lang === 'en' ? ['en'] : ['en', lang]) {
-    for (const entry of all) {
-      const [entryLang, ...rest] = entry.id.split('/');
-      if (entryLang !== pass) continue;
-      const slug = rest.join('/');
-      bySlug.set(slug, { ...entry, slug });
-    }
-  }
-  return [...bySlug.values()];
+/** All entries of a collection; `id` is the file name without extension (the URL slug). */
+export async function getAll<C extends CollectionKey>(collection: C): Promise<Entry<C>[]> {
+  return (await getCollection(collection)) as Entry<C>[];
 }
 
 export const byDateDesc = <T extends { data: { date: Date } }>(a: T, b: T) =>
@@ -33,6 +16,23 @@ export const byDateAsc = <T extends { data: { date: Date } }>(a: T, b: T) =>
 export const byOrder = <T extends { data: { order: number } }>(a: T, b: T) =>
   a.data.order - b.data.order;
 
-export function isUpcoming(date: Date, now = new Date()) {
-  return date.getTime() >= now.getTime() - 24 * 60 * 60 * 1000;
+/** True while an event (or announcement) has not ended yet, at build time. */
+export const isActive = (endDate: Date, now = new Date()) => endDate.getTime() > now.getTime();
+
+/** Events that have not ended, soonest first. */
+export async function getUpcomingEvents() {
+  return (await getAll('events')).filter((e) => isActive(e.data.endDate)).sort(byDateAsc);
+}
+
+/** The next featured event, if any (powers EventFeature, EventHero and the countdown). */
+export async function getFeaturedEvent() {
+  const upcoming = await getUpcomingEvents();
+  return upcoming.find((e) => e.data.featured) ?? undefined;
+}
+
+/** Typed access to src/content/site/site.json entries. */
+export async function getSite<K extends 'announcement' | 'prayer' | 'prayerFocus'>(id: K) {
+  const entry = await getEntry('site', id);
+  if (!entry) throw new Error(`Missing "${id}" in src/content/site/site.json`);
+  return entry.data as Extract<Entry<'site'>['data'], { id: K }>;
 }

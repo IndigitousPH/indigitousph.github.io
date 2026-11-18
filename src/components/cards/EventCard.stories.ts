@@ -4,25 +4,27 @@ import EventCard from './EventCard.astro';
 export default {
   title: 'EventCard',
   component: EventCard,
+  description: 'Event teaser used on /events.',
   width: 'sm',
   variants: [
     {
       name: 'Default',
       props: {
-        title: 'Coffee Talk Manila: Faith, AI and the Filipino church',
+        title: '#HACK for Christmas — Iloilo',
         href: '#',
-        date: new Date('2026-12-06T07:00:00Z'),
-        location: 'Makati City, Metro Manila',
-        summary: 'An afternoon of kape and honest conversation about AI and ministry.',
+        date: new Date('2026-11-20T09:00:00Z'),
+        location: 'ICMAC, Smallville, Iloilo',
+        summary:
+          '24 hours. One mission. Build something that tells the Christmas story to someone who needs it.',
       },
     },
     {
       name: 'Online, sample content',
       props: {
-        title: '#HACK2027 Philippines: Champion info session',
+        title: 'Online workers huddle',
         href: '#',
-        date: new Date('2027-02-20T11:00:00Z'),
-        location: 'Online (Zoom)',
+        date: new Date('2026-12-10T12:00:00Z'),
+        location: 'Online',
         online: true,
         placeholder: true,
       },

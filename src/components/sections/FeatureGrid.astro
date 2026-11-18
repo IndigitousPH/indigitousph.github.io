@@ -1,7 +1,11 @@
 ---
 import Icon, { type IconName } from '../ui/Icon.astro';
 
-/** Icon + title + text items, optionally linked. Used for paths, programs, ways to help. */
+/**
+ * Icon + title + text items, optionally linked.
+ * - variant="cards": the deck's Pillars (Gather / Create / Pray & serve) and partnership cards.
+ * - variant="plain": the deck's IconList (Meet / Pray / Learn / Build), icon above, one line each.
+ */
 export interface FeatureItem {
   icon: IconName;
   title: string;
@@ -12,19 +16,27 @@ export interface FeatureItem {
 interface Props {
   items: FeatureItem[];
   cols?: 2 | 3 | 4;
+  variant?: 'cards' | 'plain';
   class?: string;
 }
-const { items, cols = 3, class: className } = Astro.props;
+const { items, cols = 3, variant = 'cards', class: className } = Astro.props;
 const colClasses = {
   2: 'sm:grid-cols-2',
   3: 'sm:grid-cols-2 lg:grid-cols-3',
   4: 'sm:grid-cols-2 lg:grid-cols-4',
 };
+const cards = variant === 'cards';
 ---
 
 <ul class:list={['grid grid-cols-1 gap-6', colClasses[cols], className]}>
   {items.map((item) => (
-    <li class="group relative flex flex-col gap-4 rounded-card bg-white p-7 ring-1 ring-stone transition hover:ring-2 hover:ring-brand-orange">
+    <li
+      class:list={[
+        'group relative flex flex-col gap-4',
+        cards &&
+          'rounded-card bg-white p-7 ring-1 ring-stone transition hover:ring-2 hover:ring-brand-orange',
+      ]}
+    >
       <span class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-yellow text-ink">
         <Icon name={item.icon} />
       </span>

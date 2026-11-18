@@ -1,0 +1,40 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import CardGrid from './CardGrid.astro';
+import StoryCard from '../cards/StoryCard.astro';
+import Button from '../ui/Button.astro';
+
+/** Latest stories with a heading and "Read more stories" link (deck block 6). */
+export interface StoryTeaser {
+  title: string;
+  href: string;
+  date: Date;
+  summary: string;
+  category?: string;
+  image?: string;
+  placeholder?: boolean;
+}
+interface Props {
+  title: string;
+  stories: StoryTeaser[];
+  linkText?: string;
+  href?: string;
+  class?: string;
+}
+const { title, stories, linkText, href, class: className } = Astro.props;
+---
+
+<div class={className}>
+  <SectionHeading title={title}>
+    {href && linkText && (
+      <Button href={href} variant="outline" icon="arrow-right">
+        {linkText}
+      </Button>
+    )}
+  </SectionHeading>
+  <CardGrid>
+    {stories.map((s) => (
+      <StoryCard {...s} />
+    ))}
+  </CardGrid>
+</div>

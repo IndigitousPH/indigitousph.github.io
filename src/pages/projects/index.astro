@@ -1,5 +1,66 @@
 ---
-import Projects from '@/views/Projects.astro';
+/** Projects (footer only): things believers have built at #HACK and in local networks. */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Section from '@/components/sections/Section.astro';
+import CardGrid from '@/components/sections/CardGrid.astro';
+import CTABand from '@/components/sections/CTABand.astro';
+import ProjectCard from '@/components/cards/ProjectCard.astro';
+import SwitchTabs from '@/components/ui/SwitchTabs.astro';
+import Button from '@/components/ui/Button.astro';
+import { projectTypes } from '@/content.config';
+import { getAll } from '@/lib/content';
+
+const copy = {
+  title: 'Built by Filipino believers',
+  intro:
+    'Apps, websites, videos and campaigns from #HACK teams and local networks, made to point people to Jesus.',
+  types: { app: 'App', web: 'Web', content: 'Content', game: 'Game', research: 'Research' },
+  status: { idea: 'Idea', building: 'Building', live: 'Live' },
+  ctaTitle: 'Have an idea worth building?',
+  ctaBody: 'Bring it to #HACK, or tell us about it and we’ll help you find a team.',
+};
+const projects = (await getAll('projects')).sort((a, b) => b.data.year - a.data.year);
+const usedTypes = projectTypes.filter((type) => projects.some((p) => p.data.type === type));
 ---
 
-<Projects lang="en" />
+<BaseLayout title="Projects" description={copy.intro}>
+  <PageHero eyebrow="Projects" title={copy.title} intro={copy.intro} />
+  <Section>
+    <SwitchTabs
+      filterGroup="projects"
+      active="all"
+      label="Filter projects"
+      class="mb-10"
+      items={[
+        { label: 'All', value: 'all' },
+        ...usedTypes.map((type) => ({ label: copy.types[type], value: type })),
+      ]}
+    />
+    <CardGrid>
+      {projects.map((p) => (
+        <div data-filter-group="projects" data-filter-tags={p.data.type}>
+          <ProjectCard
+            title={p.data.title}
+            href={`/projects/${p.id}`}
+            summary={p.data.summary}
+            type={copy.types[p.data.type]}
+            status={copy.status[p.data.status]}
+            year={p.data.year}
+            placeholder={p.data.placeholder}
+          />
+        </div>
+      ))}
+    </CardGrid>
+  </Section>
+  <Section class="pt-0!">
+    <CTABand title={copy.ctaTitle} body={copy.ctaBody}>
+      <Button href="/hack" variant="dark">
+        See #HACK
+      </Button>
+      <Button href="/contact" variant="light" icon="arrow-right">
+        Talk to us
+      </Button>
+    </CTABand>
+  </Section>
+</BaseLayout>

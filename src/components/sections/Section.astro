@@ -3,13 +3,19 @@
 interface Props {
   tone?: 'white' | 'mist' | 'ink';
   id?: string;
+  /** Remove the whole section in the browser after this moment (time-limited content). */
+  hideAfter?: Date;
   class?: string;
 }
-const { tone = 'white', id, class: className } = Astro.props;
+const { tone = 'white', id, hideAfter, class: className } = Astro.props;
 const tones = { white: 'bg-white', mist: 'bg-mist', ink: 'bg-ink text-white' };
 ---
 
-<section {id} class:list={['py-16 md:py-24', tones[tone], className]}>
+<section
+  {id}
+  data-hide-after={hideAfter?.toISOString()}
+  class:list={['py-16 md:py-24', tones[tone], className]}
+>
   <div class="container-page">
     <slot />
   </div>

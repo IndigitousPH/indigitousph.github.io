@@ -1,0 +1,30 @@
+---
+import Placeholder from '../ui/Placeholder.astro';
+
+/** Photo grid with captions (deck: Past #HACKs). Items without a photo show a placeholder tile. */
+interface Props {
+  items: { caption: string; image?: string; alt?: string }[];
+  class?: string;
+}
+const { items, class: className } = Astro.props;
+---
+
+<ul class:list={['grid grid-cols-2 gap-4 md:grid-cols-3', className]}>
+  {items.map((item) => (
+    <li>
+      <figure class="flex flex-col gap-2">
+        {item.image ? (
+          <img
+            src={item.image}
+            alt={item.alt ?? item.caption}
+            class="aspect-[4/3] w-full rounded-tile object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <Placeholder icon="camera" tone="ink" class="aspect-[4/3] w-full rounded-tile" />
+        )}
+        <figcaption class="font-mono text-sm">{item.caption}</figcaption>
+      </figure>
+    </li>
+  ))}
+</ul>

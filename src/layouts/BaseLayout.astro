@@ -2,47 +2,42 @@
 import '@/styles/global.css';
 import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
-import { htmlLang, languages, switchLangPath, useTranslations, type Lang } from '@/i18n';
+import AnnouncementBar from '@/components/ui/AnnouncementBar.astro';
+import { htmlLang, t } from '@/i18n';
+import { getSite, isActive } from '@/lib/content';
 
 interface Props {
-  lang: Lang;
   title?: string;
   description?: string;
+  /** Open Graph image under /public. */
   image?: string;
   noindex?: boolean;
-  /** Hide header/footer (used by /storybook). */
+  /** Hide announcement, header and footer (used by /storybook). */
   bare?: boolean;
 }
 const {
-  lang,
   title,
   description,
   image = '/og-default.svg',
   noindex = false,
   bare = false,
 } = Astro.props;
-const t = useTranslations(lang);
 const siteName = t('site.name');
 const fullTitle = title ? `${title} · ${siteName}` : `${siteName} — ${t('site.tagline')}`;
 const desc = description ?? t('site.description');
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const announcement = await getSite('announcement');
+const showAnnouncement = !bare && announcement.enabled && isActive(announcement.endDate);
 ---
 
 <!doctype html>
-<html lang={htmlLang[lang]}>
+<html lang={htmlLang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={desc} />
     <link rel="canonical" href={canonical} />
-    {(Object.keys(languages) as Lang[]).map((l) => (
-      <link
-        rel="alternate"
-        hreflang={htmlLang[l]}
-        href={new URL(switchLangPath(Astro.url.pathname, l), Astro.site)}
-      />
-    ))}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="theme-color" content="#131313" />
     <meta property="og:type" content="website" />
@@ -51,7 +46,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:description" content={desc} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={new URL(image, Astro.site)} />
-    <meta property="og:locale" content={htmlLang[lang].replace('-', '_')} />
+    <meta property="og:locale" content="en_PH" />
     <meta name="twitter:card" content="summary_large_image" />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -63,10 +58,53 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="sitemap" href="/sitemap-index.xml" />
   </head>
   <body class="flex min-h-screen flex-col">
-    {!bare && <Header {lang} />}
+    {showAnnouncement && (
+      <AnnouncementBar
+        text={announcement.text}
+        linkText={announcement.linkText}
+        href={announcement.href}
+        endDate={announcement.endDate}
+        dismissLabel={t('cta.dismiss')}
+      />
+    )}
+    {!bare && <Header />}
     <main id="main" class="flex-1">
       <slot />
     </main>
-    {!bare && <Footer {lang} />}
+    {!bare && <Footer />}
+
+    <script>
+      // Events auto-expire: anything marked data-hide-after disappears once that moment has passed,
+      // even if the static build is older than the event.
+      document.querySelectorAll<HTMLElement>('[data-hide-after]').forEach((el) => {
+        if (new Date(el.dataset.hideAfter!).getTime() < Date.now()) el.remove();
+      });
+
+      // Forms post to a form service; with JS they submit in place and show their success message.
+      document.querySelectorAll<HTMLFormElement>('form[data-form]').forEach((form) => {
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+          const ok = form.querySelector<HTMLElement>('[data-success]');
+          const fail = form.querySelector<HTMLElement>('[data-error]');
+          button?.setAttribute('disabled', '');
+          fail?.classList.add('hidden');
+          try {
+            const res = await fetch(form.action, {
+              method: 'POST',
+              body: new FormData(form),
+              headers: { Accept: 'application/json' },
+            });
+            if (!res.ok) throw new Error(String(res.status));
+            [...form.children].forEach((el) => el !== ok && el.classList.add('hidden'));
+            ok?.classList.remove('hidden');
+            ok?.focus();
+          } catch {
+            fail?.classList.remove('hidden');
+            button?.removeAttribute('disabled');
+          }
+        });
+      });
+    </script>
   </body>
 </html>

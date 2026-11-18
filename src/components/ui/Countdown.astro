@@ -1,0 +1,89 @@
+---
+/**
+ * Live countdown (days : hours : minutes) to a date. Renders the build-time value,
+ * then a small script keeps it ticking. Shows `endedLabel` once the date has passed.
+ */
+interface Props {
+  to: Date;
+  label?: string;
+  endedLabel?: string;
+  tone?: 'dark' | 'light';
+  class?: string;
+}
+const { to, label, endedLabel = 'Happening now', tone = 'dark', class: className } = Astro.props;
+const diff = Math.max(0, to.getTime() - Date.now());
+const parts = {
+  days: Math.floor(diff / 86_400_000),
+  hours: Math.floor((diff % 86_400_000) / 3_600_000),
+  minutes: Math.floor((diff % 3_600_000) / 60_000),
+};
+const pad = (n: number) => String(n).padStart(2, '0');
+const units = [
+  ['days', 'days'],
+  ['hours', 'hrs'],
+  ['minutes', 'min'],
+] as const;
+---
+
+<div
+  class:list={['flex flex-col gap-2', className]}
+  data-countdown={to.toISOString()}
+  data-ended={endedLabel}
+>
+  {label && (
+    <p class:list={['eyebrow', tone === 'dark' ? 'text-brand-yellow' : 'text-brand-orange-dark']}>
+      {label}
+    </p>
+  )}
+  <div class="flex items-center gap-2 font-mono" role="timer" aria-live="off">
+    {units.map(([key, short], i) => (
+      <>
+        {i > 0 && (
+          <span
+            class:list={['text-2xl font-bold', tone === 'dark' ? 'text-white/50' : 'text-ink/40']}
+          >
+            :
+          </span>
+        )}
+        <span
+          class:list={[
+            'flex min-w-16 flex-col items-center rounded-tile px-3 py-2',
+            tone === 'dark' ? 'bg-white/10 text-white' : 'bg-mist text-ink',
+          ]}
+        >
+          <span class="text-3xl leading-none font-bold tabular-nums md:text-4xl" data-unit={key}>
+            {pad(parts[key])}
+          </span>
+          <span class="mt-1 text-xs opacity-75">{short}</span>
+        </span>
+      </>
+    ))}
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-countdown]').forEach((el) => {
+    const target = new Date(el.dataset.countdown!).getTime();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const tick = () => {
+      const diff = target - Date.now();
+      if (diff <= 0) {
+        const timer = el.querySelector('[role="timer"]');
+        if (timer) timer.textContent = el.dataset.ended ?? '';
+        timer?.classList.add('text-2xl', 'font-bold');
+        return false;
+      }
+      const set = (unit: string, v: number) => {
+        const node = el.querySelector(`[data-unit="${unit}"]`);
+        if (node) node.textContent = pad(v);
+      };
+      set('days', Math.floor(diff / 86_400_000));
+      set('hours', Math.floor((diff % 86_400_000) / 3_600_000));
+      set('minutes', Math.floor((diff % 3_600_000) / 60_000));
+      return true;
+    };
+    if (tick()) {
+      const id = setInterval(() => tick() || clearInterval(id), 15_000);
+    }
+  });
+</script>

@@ -1,0 +1,61 @@
+---
+import Countdown from '../ui/Countdown.astro';
+
+/**
+ * #HACK hero (deck: EventHero). Bold key art background, countdown, big button (slot).
+ * Pass `countdownTo` only while the event is upcoming.
+ */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  intro?: string;
+  image?: string;
+  countdownTo?: Date;
+  /** When the event ends; the countdown ("Happening now") is removed after this. */
+  countdownEnd?: Date;
+  countdownLabel?: string;
+  class?: string;
+}
+const {
+  eyebrow,
+  title,
+  intro,
+  image,
+  countdownTo,
+  countdownEnd,
+  countdownLabel,
+  class: className,
+} = Astro.props;
+---
+
+<section class:list={['relative isolate overflow-hidden bg-ink text-white', className]}>
+  {image ? (
+    <>
+      <img
+        src={image}
+        alt=""
+        class="absolute inset-0 -z-10 h-full w-full object-cover"
+        fetchpriority="high"
+      />
+      <div class="absolute inset-0 -z-10 bg-ink/75" aria-hidden="true" />
+    </>
+  ) : (
+    <div
+      class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_85%_15%,var(--color-brand-orange),transparent_45%),radial-gradient(circle_at_10%_100%,var(--color-brand-pink),transparent_35%)] opacity-70"
+      aria-hidden="true"
+    />
+  )}
+  <div class="container-page flex flex-col gap-6 py-20 md:py-28">
+    {eyebrow && <p class="eyebrow text-brand-yellow">{eyebrow}</p>}
+    <h1 class="max-w-4xl text-4xl leading-[1.1] sm:text-5xl lg:text-6xl">{title}</h1>
+    {intro && <p class="max-w-2xl text-lg text-white/85 md:text-xl">{intro}</p>}
+    {countdownTo && (
+      <div data-hide-after={countdownEnd?.toISOString()}>
+        <Countdown to={countdownTo} label={countdownLabel} class="pt-2" />
+      </div>
+    )}
+    <div class="flex flex-wrap gap-3 pt-2 empty:hidden">
+      <slot />
+    </div>
+  </div>
+</section>

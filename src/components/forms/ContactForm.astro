@@ -1,0 +1,32 @@
+---
+import FormShell from './FormShell.astro';
+import Field from '../ui/Field.astro';
+import { forms } from '@/config/site';
+
+/** Contact form (deck: /contact). */
+interface Props {
+  endpoint?: string;
+  class?: string;
+}
+const { endpoint = forms.general, class: className } = Astro.props;
+---
+
+<FormShell
+  endpoint={endpoint}
+  formName="contact"
+  submitLabel="Send message"
+  success="Salamat! We’ll get back to you within 3 days."
+  class={className}
+>
+  <div class="grid gap-5 sm:grid-cols-2">
+    <Field label="Name" name="name" required />
+    <Field label="Email" name="email" type="email" required />
+  </div>
+  <Field
+    label="I’m reaching out about…"
+    name="topic"
+    as="select"
+    options={['Joining a network', '#HACK', 'Prayer', 'Partnership', 'Media', 'Other']}
+  />
+  <Field label="Message" name="message" as="textarea" required />
+</FormShell>

@@ -1,13 +1,69 @@
 ---
-import ProjectDetail from '@/views/ProjectDetail.astro';
-import { getLocalized } from '@/lib/content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/sections/Section.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import PillTag from '@/components/ui/PillTag.astro';
+import { render } from 'astro:content';
+import { getAll, type Entry } from '@/lib/content';
 
 export async function getStaticPaths() {
-  const entries = await getLocalized('projects', 'en');
-  return entries.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+  return (await getAll('projects')).map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
 }
 
-const { entry } = Astro.props;
+const { entry } = Astro.props as { entry: Entry<'projects'> };
+const { Content } = await render(entry);
+const d = entry.data;
 ---
 
-<ProjectDetail lang="en" {entry} />
+<BaseLayout title={d.title} description={d.summary}>
+  <header class="bg-brand-yellow">
+    <div class="container-page flex flex-col gap-5 py-16 md:py-20">
+      <a
+        href="/projects"
+        class="inline-flex w-max items-center gap-2 font-mono text-sm hover:text-brand-orange-dark"
+      >
+        <Icon name="arrow-left" size={16} />
+        Projects
+      </a>
+      <div class="flex flex-wrap gap-2">
+        <PillTag tone="ink" size="sm">
+          {d.type}
+        </PillTag>
+        <PillTag tone="outline" size="sm">
+          {d.status}
+        </PillTag>
+        <PillTag tone="outline" size="sm">
+          {d.year}
+        </PillTag>
+        {d.placeholder && (
+          <PillTag tone="outline" size="sm">
+            Sample content
+          </PillTag>
+        )}
+      </div>
+      <h1 class="max-w-4xl text-4xl md:text-5xl">{d.title}</h1>
+      <p class="max-w-2xl text-lg text-ink-2">{d.summary}</p>
+      <div class="flex flex-wrap gap-3 empty:hidden">
+        {d.url && (
+          <Button href={d.url} variant="dark" external icon="arrow-up-right">
+            Visit
+          </Button>
+        )}
+        {d.repo && (
+          <Button href={d.repo} variant="outline" external icon="code" iconPosition="start">
+            Code
+          </Button>
+        )}
+      </div>
+    </div>
+  </header>
+  <Section>
+    <div class="prose-indigitous">
+      <Content />
+    </div>
+  </Section>
+</BaseLayout>

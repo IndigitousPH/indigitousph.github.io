@@ -1,5 +1,80 @@
 ---
-import Events from '@/views/Events.astro';
+/** Events (footer only): every event, with an upcoming / past switch based on the visitor's clock. */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Section from '@/components/sections/Section.astro';
+import CardGrid from '@/components/sections/CardGrid.astro';
+import EventCard from '@/components/cards/EventCard.astro';
+import SwitchTabs from '@/components/ui/SwitchTabs.astro';
+import { t } from '@/i18n';
+import { byDateAsc, getAll } from '@/lib/content';
+
+const copy = {
+  title: 'Events',
+  intro: '#HACK sprints, network gatherings and prayer times, online and across the Philippines.',
+};
+const events = (await getAll('events')).sort(byDateAsc);
 ---
 
-<Events lang="en" />
+<BaseLayout title="Events" description={copy.intro}>
+  <PageHero eyebrow="Events" title={copy.title} intro={copy.intro} />
+  <Section>
+    <SwitchTabs
+      filterGroup="events"
+      active="upcoming"
+      label="Filter events"
+      class="mb-10"
+      items={[
+        { label: t('events.upcoming'), value: 'upcoming' },
+        { label: t('events.past'), value: 'past' },
+        { label: t('events.all'), value: 'all' },
+      ]}
+    />
+    <CardGrid>
+      {events.map((e) => (
+        <div
+          data-filter-group="events"
+          data-event-end={e.data.endDate.toISOString()}
+          data-filter-tags=""
+        >
+          <EventCard
+            title={e.data.title}
+            href={`/events/${e.id}`}
+            date={e.data.date}
+            location={
+              e.data.online || e.data.venue.includes(e.data.city)
+                ? e.data.venue
+                : `${e.data.venue}, ${e.data.city}`
+            }
+            summary={e.data.summary}
+            image={e.data.image}
+            online={e.data.online}
+            placeholder={e.data.placeholder}
+          />
+        </div>
+      ))}
+    </CardGrid>
+    <p class="hidden py-10 text-center text-muted" data-events-empty>
+      {t('events.none')}
+    </p>
+  </Section>
+</BaseLayout>
+
+<script>
+  // The site is static, so upcoming/past is decided with the visitor's clock.
+  const cards = document.querySelectorAll<HTMLElement>('[data-filter-group="events"]');
+  cards.forEach((el) => {
+    el.dataset.filterTags =
+      new Date(el.dataset.eventEnd!).getTime() > Date.now() ? 'upcoming' : 'past';
+  });
+  const empty = document.querySelector<HTMLElement>('[data-events-empty]');
+  const update = () =>
+    empty?.classList.toggle(
+      'hidden',
+      [...cards].some((c) => !c.hidden),
+    );
+  document.querySelector('[data-switch-tabs="events"]')?.addEventListener('filter', update);
+  document
+    .querySelector<HTMLButtonElement>('[data-switch-tabs="events"] button[aria-pressed="true"]')
+    ?.click();
+</script>

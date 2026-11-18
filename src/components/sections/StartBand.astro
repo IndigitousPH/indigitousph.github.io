@@ -1,0 +1,24 @@
+---
+/** "Start a network" (deck: StartBand): highlighted warm box with one button in the slot. */
+interface Props {
+  title: string;
+  body?: string;
+  class?: string;
+}
+const { title, body, class: className } = Astro.props;
+---
+
+<div
+  class:list={[
+    'flex flex-col gap-6 rounded-card border-2 border-dashed border-brand-orange bg-brand-yellow/40 p-8 md:flex-row md:items-center md:justify-between md:p-12',
+    className,
+  ]}
+>
+  <div class="flex max-w-2xl flex-col gap-3">
+    <h2 class="text-3xl">{title}</h2>
+    {body && <p class="text-lg text-ink-2">{body}</p>}
+  </div>
+  <div class="shrink-0">
+    <slot />
+  </div>
+</div>

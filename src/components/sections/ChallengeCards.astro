@@ -1,0 +1,42 @@
+---
+import PillTag from '../ui/PillTag.astro';
+
+/** #HACK challenges (deck: ChallengeCards). Shows a "coming soon" note until challenges exist. */
+interface Props {
+  challenges: { tag: string; problem: string; partner: string }[];
+  emptyText?: string;
+  sharedByLabel?: string;
+  class?: string;
+}
+const {
+  challenges,
+  emptyText = 'Challenges coming soon.',
+  sharedByLabel = 'Shared by',
+  class: className,
+} = Astro.props;
+---
+
+{challenges.length ? (
+  <ul class:list={['grid gap-6 sm:grid-cols-2 lg:grid-cols-3', className]}>
+    {challenges.map((c) => (
+      <li class="flex flex-col gap-4 rounded-card bg-white p-7 ring-1 ring-stone">
+        <PillTag tone="ink" size="sm">
+          #{c.tag.replace(/^#/, '')}
+        </PillTag>
+        <p class="text-xl font-bold">{c.problem}</p>
+        <p class="mt-auto font-mono text-sm text-muted">
+          {sharedByLabel} {c.partner}
+        </p>
+      </li>
+    ))}
+  </ul>
+) : (
+  <p
+    class:list={[
+      'rounded-card border-2 border-dashed border-stone p-8 text-center font-mono text-muted',
+      className,
+    ]}
+  >
+    {emptyText}
+  </p>
+)}

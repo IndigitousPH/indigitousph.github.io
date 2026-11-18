@@ -1,5 +1,158 @@
 ---
-import Home from '@/views/Home.astro';
+/**
+ * Home (deck: "help a visitor see themselves in God's mission and take one next step").
+ * Seven blocks: Hero · Intro · Pillars · EventFeature · Gifts · StoryCards · CTABand.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import Section from '@/components/sections/Section.astro';
+import Intro from '@/components/sections/Intro.astro';
+import FeatureGrid, { type FeatureItem } from '@/components/sections/FeatureGrid.astro';
+import EventFeature from '@/components/sections/EventFeature.astro';
+import Gifts from '@/components/sections/Gifts.astro';
+import StoryCards from '@/components/sections/StoryCards.astro';
+import CTABand from '@/components/sections/CTABand.astro';
+import Button from '@/components/ui/Button.astro';
+import { storyCategories } from '@/content.config';
+import { formatRange } from '@/i18n';
+import { byDateDesc, getAll, getFeaturedEvent } from '@/lib/content';
+
+const copy = {
+  hero: {
+    eyebrow: 'Indigitous Philippines',
+    title: 'Your gifts have a place in God’s mission.',
+    intro:
+      'We’re a movement of Filipino believers (creatives, builders, storytellers and intercessors) sharing Jesus in our world in the digital space.',
+    primary: 'Find your local network',
+    secondary: 'What is Indigitous?',
+  },
+  intro: {
+    title: 'The mission hasn’t changed. Where people gather has.',
+    body: 'Filipinos spend hours every day online: scrolling, chatting, creating, searching for answers. That’s where many of our friends, classmates and neighbours are asking the big questions about life and faith. We believe the Church can meet them there with the same hope, the same love, and the same Jesus.',
+    quote: 'Go and make disciples of all nations.',
+    cite: 'Matthew 28:19',
+  },
+  pillars: [
+    {
+      icon: 'users',
+      title: 'Gather',
+      body: 'Local networks of believers who meet, pray and dream together about missions in a digital age.',
+      href: '/networks',
+      cta: 'Find a network',
+    },
+    {
+      icon: 'lightbulb',
+      title: 'Create',
+      body: '#HACK sprints where teams turn ideas into apps, campaigns, art and content that point people to Jesus.',
+      href: '/hack',
+      cta: 'See #HACK',
+    },
+    {
+      icon: 'hands-praying',
+      title: 'Pray & serve',
+      body: 'A praying community that stands behind believers who share the gospel online every day.',
+      href: '/pray',
+      cta: 'Join the prayer time',
+    },
+  ] satisfies FeatureItem[],
+  gifts: {
+    title: 'You don’t have to be a programmer.',
+    body: 'If you can create, organize, encourage or pray, there’s room for you here.',
+    tiles: [
+      { label: 'Designers', icon: 'palette' },
+      { label: 'Writers & storytellers', icon: 'pen' },
+      { label: 'Video & photo', icon: 'camera' },
+      { label: 'Developers', icon: 'code' },
+      { label: 'Organizers', icon: 'clipboard' },
+      { label: 'Intercessors', icon: 'hands-praying' },
+    ] as const,
+    linkText: 'Find where you fit',
+  },
+  stories: { title: 'What God is doing', linkText: 'Read more stories' },
+  closing: {
+    title: 'Tara, let’s join God in our world in the digital space.',
+    body: 'Whether you want to belong, build or give, there’s a next step for you.',
+  },
+};
+
+const event = await getFeaturedEvent();
+const stories = (await getAll('stories')).sort(byDateDesc).slice(0, 3);
 ---
 
-<Home lang="en" />
+<BaseLayout>
+  <Hero eyebrow={copy.hero.eyebrow} title={copy.hero.title} intro={copy.hero.intro}>
+    <Fragment slot="actions">
+      <Button href="/networks" size="lg">
+        {copy.hero.primary}
+      </Button>
+      <Button href="/about" size="lg" variant="outline-light">
+        {copy.hero.secondary}
+      </Button>
+    </Fragment>
+  </Hero>
+
+  <Section>
+    <Intro {...copy.intro} />
+  </Section>
+
+  <Section tone="mist">
+    <FeatureGrid items={copy.pillars} />
+  </Section>
+
+  {event && (
+    <Section hideAfter={event.data.endDate}>
+      <EventFeature
+        title={event.data.title}
+        details={[
+          formatRange(event.data.date, event.data.endDate),
+          event.data.venue,
+          event.data.fee,
+        ]
+          .filter(Boolean)
+          .join(' · ')}
+        body={event.data.summary}
+        href={event.data.registerUrl}
+        image={event.data.image}
+        endDate={event.data.endDate}
+      />
+    </Section>
+  )}
+
+  <Section tone={event ? 'mist' : 'white'}>
+    <Gifts
+      title={copy.gifts.title}
+      body={copy.gifts.body}
+      tiles={[...copy.gifts.tiles]}
+      linkText={copy.gifts.linkText}
+      href="/networks#connect"
+    />
+  </Section>
+
+  <Section tone={event ? 'white' : 'mist'}>
+    <StoryCards
+      title={copy.stories.title}
+      linkText={copy.stories.linkText}
+      href="/stories"
+      stories={stories.map((s) => ({
+        title: s.data.title,
+        href: `/stories/${s.id}`,
+        date: s.data.date,
+        summary: s.data.summary,
+        category: storyCategories[s.data.category],
+        image: s.data.image,
+        placeholder: s.data.placeholder,
+      }))}
+    />
+  </Section>
+
+  <Section class="pt-0!">
+    <CTABand align="center" title={copy.closing.title} body={copy.closing.body}>
+      <Button href="/networks" variant="dark">
+        Join a local network
+      </Button>
+      <Button href="/partner" variant="outline">
+        Partner with us
+      </Button>
+    </CTABand>
+  </Section>
+</BaseLayout>

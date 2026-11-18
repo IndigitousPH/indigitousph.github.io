@@ -1,54 +1,35 @@
 import { en, type UIKey } from './en';
-import { fil } from './fil';
 
-export const languages = { en: 'English', fil: 'Filipino' } as const;
+/**
+ * The site is English-only for now (with small Filipino touches in the copy).
+ * Short reusable UI strings live in en.ts so a Filipino version can be added later
+ * by adding fil.ts and routing.
+ */
+export const languages = { en: 'English' } as const;
 export type Lang = keyof typeof languages;
-export const defaultLang: Lang = 'en';
-export const htmlLang: Record<Lang, string> = { en: 'en-PH', fil: 'fil-PH' };
+export const htmlLang = 'en-PH';
 
-const dictionaries: Record<Lang, Record<UIKey, string>> = { en, fil };
+export const t = (key: UIKey) => en[key];
 
-/** `const t = useTranslations(lang); t('nav.about')` */
-export function useTranslations(lang: Lang) {
-  return (key: UIKey) => dictionaries[lang][key] ?? en[key];
-}
+const TZ = 'Asia/Manila';
 
-/** Language of the current URL. */
-export function getLangFromUrl(url: URL): Lang {
-  const [, first] = url.pathname.split('/');
-  return first === 'fil' ? 'fil' : 'en';
-}
-
-/** Turn a language-neutral path ("/about") into a localized one ("/fil/about"). */
-export function localizePath(path: string, lang: Lang): string {
-  if (/^(https?:|mailto:|tel:|#)/.test(path)) return path;
-  const clean = path.startsWith('/') ? path : `/${path}`;
-  if (lang === defaultLang) return clean;
-  return clean === '/' ? `/${lang}/` : `/${lang}${clean}`;
-}
-
-/** Strip the language prefix from a pathname. */
-export function stripLang(pathname: string): string {
-  const stripped = pathname.replace(/^\/fil(?=\/|$)/, '');
-  return stripped === '' ? '/' : stripped;
-}
-
-/** Same page in another language. */
-export function switchLangPath(pathname: string, target: Lang): string {
-  return localizePath(stripLang(pathname), target);
-}
-
-/** Pick a value from a `{ en, fil }` copy object. */
-export function pick<T>(copy: Record<Lang, T>, lang: Lang): T {
-  return copy[lang] ?? copy[defaultLang];
-}
-
-export function formatDate(date: Date, lang: Lang, opts?: Intl.DateTimeFormatOptions) {
-  return date.toLocaleDateString(htmlLang[lang], {
+export function formatDate(date: Date, opts?: Intl.DateTimeFormatOptions) {
+  return date.toLocaleDateString(htmlLang, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-    timeZone: 'Asia/Manila',
+    timeZone: TZ,
     ...opts,
   });
+}
+
+export function formatTime(date: Date) {
+  return date.toLocaleTimeString(htmlLang, { hour: 'numeric', minute: '2-digit', timeZone: TZ });
+}
+
+/** "Nov 20, 5 PM to Nov 21, 5 PM" */
+export function formatRange(start: Date, end: Date) {
+  const day = (d: Date) => formatDate(d, { year: undefined, month: 'short', day: 'numeric' });
+  const time = (d: Date) => formatTime(d).replace(':00', '');
+  return `${day(start)}, ${time(start)} to ${day(end)}, ${time(end)}`;
 }

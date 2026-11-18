@@ -2,28 +2,30 @@
 import PillTag from '../ui/PillTag.astro';
 import Placeholder from '../ui/Placeholder.astro';
 
-/** Team member: photo, name, yellow role pill. */
+/** Team member (deck: TeamGrid card): round photo, name, role, one-line "I serve because…". */
 interface Props {
   name: string;
   role: string;
-  community?: string;
+  serveBecause?: string;
   photo?: string;
+  placeholder?: boolean;
   class?: string;
 }
-const { name, role, community, photo, class: className } = Astro.props;
+const { name, role, serveBecause, photo, placeholder = false, class: className } = Astro.props;
 ---
 
-<article class:list={['flex flex-col gap-4', className]}>
-  <div class="relative aspect-square overflow-hidden rounded-card">
-    {photo ? (
-      <img src={photo} alt={name} class="h-full w-full object-cover" loading="lazy" />
-    ) : (
-      <Placeholder label={name} tone="yellow" class="h-full w-full" />
-    )}
-    <PillTag class="absolute bottom-4 left-4">{role}</PillTag>
-  </div>
-  <div>
-    <h3 class="text-xl">{name}</h3>
-    {community && <p class="font-mono text-sm text-muted">{community}</p>}
-  </div>
+<article class:list={['flex flex-col items-center gap-3 text-center', className]}>
+  {photo ? (
+    <img src={photo} alt={name} class="h-36 w-36 rounded-full object-cover" loading="lazy" />
+  ) : (
+    <Placeholder label={name} tone="yellow" class="h-36 w-36 rounded-full" />
+  )}
+  <h3 class="mt-2 text-xl">{name}</h3>
+  <PillTag size="sm">{role}</PillTag>
+  {serveBecause && <p class="max-w-xs text-ink-2 italic">“{serveBecause}”</p>}
+  {placeholder && (
+    <PillTag tone="outline" size="sm">
+      Sample content
+    </PillTag>
+  )}
 </article>

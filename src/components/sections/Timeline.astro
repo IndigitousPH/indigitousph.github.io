@@ -1,0 +1,25 @@
+---
+/** Vertical timeline (deck: Our story), 3–5 milestones. */
+interface Props {
+  intro?: string;
+  items: { year: string; text: string }[];
+  class?: string;
+}
+const { intro, items, class: className } = Astro.props;
+---
+
+<div class:list={['flex flex-col gap-8', className]}>
+  {intro && <p class="max-w-2xl text-lg text-ink-2">{intro}</p>}
+  <ol class="relative ml-3 border-l-2 border-brand-yellow">
+    {items.map((item) => (
+      <li class="relative pb-8 pl-8 last:pb-0">
+        <span
+          class="absolute top-1 -left-[9px] h-4 w-4 rounded-full bg-brand-orange-dark ring-4 ring-white"
+          aria-hidden="true"
+        />
+        <p class="font-mono text-sm font-bold text-brand-orange-dark">{item.year}</p>
+        <p class="mt-1 text-lg">{item.text}</p>
+      </li>
+    ))}
+  </ol>
+</div>

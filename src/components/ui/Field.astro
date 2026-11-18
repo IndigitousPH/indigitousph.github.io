@@ -3,6 +3,8 @@
 interface Props {
   label: string;
   name: string;
+  /** Defaults to `f-<name>`; set it when two forms on one page share a field name. */
+  id?: string;
   as?: 'input' | 'select' | 'textarea';
   type?: 'text' | 'email' | 'tel' | 'url';
   placeholder?: string;
@@ -15,6 +17,7 @@ interface Props {
 const {
   label,
   name,
+  id: idProp,
   as = 'input',
   type = 'text',
   placeholder,
@@ -24,7 +27,7 @@ const {
   tone = 'light',
   class: className,
 } = Astro.props;
-const id = `f-${name}`;
+const id = idProp ?? `f-${name}`;
 const control = [
   'w-full px-6 py-3.5 text-base outline-none transition focus:ring-2',
   tone === 'light'

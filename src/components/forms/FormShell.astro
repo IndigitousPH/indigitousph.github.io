@@ -1,0 +1,87 @@
+---
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import { site } from '@/config/site';
+
+/**
+ * Wraps every form. Posts to a form service (`endpoint`); with JavaScript it submits in place
+ * and shows `success`. When `endpoint` is empty it shows contact links instead of the form.
+ */
+interface Props {
+  endpoint: string;
+  submitLabel: string;
+  success: string;
+  /** Hidden field so one endpoint can tell forms apart. */
+  formName: string;
+  note?: string;
+  class?: string;
+}
+const { endpoint, submitLabel, success, formName, note, class: className } = Astro.props;
+---
+
+{endpoint ? (
+  <form action={endpoint} method="post" class:list={['flex flex-col gap-5', className]} data-form>
+    <input type="hidden" name="_form" value={formName} />
+    <input
+      type="text"
+      name="_gotcha"
+      tabindex="-1"
+      autocomplete="off"
+      class="hidden"
+      aria-hidden="true"
+    />
+    <slot />
+    <div class="flex flex-col gap-3">
+      <Button type="submit" size="lg" icon="arrow-right" class="self-start max-w-full">
+        {submitLabel}
+      </Button>
+      {note && (
+        <p class="flex items-center gap-2 text-sm text-muted">
+          <Icon name="lock" size={14} />
+          {note}
+        </p>
+      )}
+    </div>
+    <p
+      class="hidden rounded-tile bg-brand-yellow p-5 text-lg font-medium"
+      role="status"
+      tabindex="-1"
+      data-success
+    >
+      {success}
+    </p>
+    <p class="hidden rounded-tile bg-brand-pink/15 p-5" role="alert" data-error>
+      Something went wrong. Please try again, or message us on Facebook.
+    </p>
+  </form>
+) : (
+  <div class:list={['rounded-card bg-mist p-8', className]}>
+    <p class="text-lg">This form isn’t switched on yet. For now, reach us here:</p>
+    <ul class="mt-5 flex flex-col gap-3">
+      {site.contactEmail && (
+        <li>
+          <a
+            href={`mailto:${site.contactEmail}`}
+            class="inline-flex items-center gap-2 font-medium text-brand-orange-dark underline"
+          >
+            <Icon name="mail" />
+            {site.contactEmail}
+          </a>
+        </li>
+      )}
+      {site.socials.slice(0, 2).map((s) => (
+        <li>
+          <a
+            href={s.href}
+            class="inline-flex items-center gap-2 font-medium text-brand-orange-dark underline"
+          >
+            <Icon name={s.icon} />
+            {s.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
+<!-- Submit handling lives in BaseLayout (shared with the footer newsletter). -->

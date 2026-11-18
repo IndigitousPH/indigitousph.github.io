@@ -1,22 +1,59 @@
 ---
 import Logo from '../ui/Logo.astro';
 import Icon from '../ui/Icon.astro';
-import { footerNav, site } from '@/config/site';
-import { localizePath, useTranslations, type Lang } from '@/i18n';
+import Button from '../ui/Button.astro';
+import { exploreNav, forms, involvedNav, site } from '@/config/site';
+import { t } from '@/i18n';
 
-interface Props {
-  lang: Lang;
-}
-const { lang } = Astro.props;
-const t = useTranslations(lang);
+/** Footer (deck: Footer.astro): dark band, four columns (Brand / Explore / Get involved / Stay connected). */
 const year = new Date().getFullYear();
+const linkClass = 'text-white/85 hover:text-brand-yellow';
 ---
 
 <footer class="bg-ink text-white">
-  <div class="container-page grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1fr]">
+  <div class="container-page grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1.4fr]">
     <div class="flex max-w-sm flex-col gap-5">
       <Logo tone="light" />
-      <p class="text-white/75">{t('footer.about')}</p>
+      <p class="text-white/80">{t('site.positioning')}</p>
+      <a
+        href={site.global.home}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-1.5 font-mono text-sm text-brand-yellow hover:underline"
+      >
+        {t('footer.global')}
+        <Icon name="arrow-up-right" size={14} />
+      </a>
+    </div>
+
+    <nav aria-label={t('footer.explore')}>
+      <h2 class="eyebrow mb-4 text-brand-yellow">{t('footer.explore')}</h2>
+      <ul class="flex flex-col gap-2.5">
+        {exploreNav.map((item) => (
+          <li>
+            <a href={item.href} class={linkClass}>
+              {t(item.key)}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <nav aria-label={t('footer.getInvolved')}>
+      <h2 class="eyebrow mb-4 text-brand-yellow">{t('footer.getInvolved')}</h2>
+      <ul class="flex flex-col gap-2.5">
+        {involvedNav.map((item) => (
+          <li>
+            <a href={item.href} class={linkClass}>
+              {t(item.key)}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="flex flex-col gap-5">
+      <h2 class="eyebrow text-brand-yellow">{t('footer.connected')}</h2>
       <ul class="flex gap-2">
         {site.socials.map((s) => (
           <li>
@@ -31,52 +68,45 @@ const year = new Date().getFullYear();
           </li>
         ))}
       </ul>
-    </div>
-
-    <nav aria-label={t('footer.explore')}>
-      <h2 class="eyebrow mb-4 text-brand-yellow">{t('footer.explore')}</h2>
-      <ul class="grid grid-cols-2 gap-x-6 gap-y-2.5 md:grid-cols-1">
-        {footerNav.map((item) => (
-          <li>
-            <a href={localizePath(item.href, lang)} class="text-white/85 hover:text-brand-yellow">
-              {t(item.key)}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-
-    <div>
-      <h2 class="eyebrow mb-4 text-brand-yellow">{t('footer.global')}</h2>
-      <ul class="flex flex-col gap-2.5">
-        <li>
-          <a href={site.global.home} class="text-white/85 hover:text-brand-yellow">
-            indigitous.org
-          </a>
-        </li>
-        <li>
-          <a href={site.global.hack} class="text-white/85 hover:text-brand-yellow">
-            #HACK
-          </a>
-        </li>
-        <li>
-          <a href={site.global.learn} class="text-white/85 hover:text-brand-yellow">
-            Learn
-          </a>
-        </li>
-        <li>
-          <a href={site.global.statementOfFaith} class="text-white/85 hover:text-brand-yellow">
-            {t('footer.faith')}
-          </a>
-        </li>
-      </ul>
+      {forms.newsletter ? (
+        <form action={forms.newsletter} method="post" class="flex flex-col gap-3" data-form>
+          <label for="footer-email" class="text-white/85">
+            {t('footer.newsletter')}
+          </label>
+          <input type="hidden" name="_form" value="newsletter" />
+          <div class="flex flex-col gap-2 sm:flex-row lg:flex-col xl:flex-row">
+            <input
+              id="footer-email"
+              name="email"
+              type="email"
+              required
+              placeholder="you@example.com"
+              class="w-full min-w-0 rounded-pill border border-white/60 bg-transparent px-5 py-3 text-white placeholder:text-white/60 focus:ring-2 focus:ring-white focus:outline-none"
+            />
+            <Button type="submit" variant="light" class="shrink-0">
+              {t('footer.newsletterCta')}
+            </Button>
+          </div>
+          <p class="hidden text-brand-yellow" role="status" tabindex="-1" data-success>
+            Salamat! You’re on the list.
+          </p>
+          <p class="hidden text-brand-yellow" role="alert" data-error>
+            {t('form.error')}
+          </p>
+        </form>
+      ) : (
+        <div class="flex flex-col gap-3">
+          <p class="text-white/85">{t('footer.newsletter')}</p>
+          <Button href="/contact" variant="light" class="self-start max-w-full">
+            {t('footer.newsletterCta')}
+          </Button>
+        </div>
+      )}
     </div>
   </div>
   <div class="border-t border-white/10">
     <div class="container-page flex flex-col gap-2 py-6 font-mono text-sm text-white/60 sm:flex-row sm:justify-between">
-      <p>
-        © {year} Indigitous Philippines. {t('footer.rights')}
-      </p>
+      <p>© {year} Indigitous Philippines</p>
       <a href={site.global.privacy} class="hover:text-brand-yellow">
         {t('footer.privacy')}
       </a>
