@@ -1,0 +1,20 @@
+// Cloudflare Workers config. The site is fully static, so the Worker has no
+// script: Cloudflare serves the files in dist/ as static assets.
+// Deploy: `pnpm deploy:cf` (or the "Deploy to Cloudflare Workers" GitHub workflow).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "indigitousph",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    // /about → about/index.html, the same URLs GitHub Pages serves.
+    "html_handling": "auto-trailing-slash",
+    // Unknown URLs get dist/404.html with a real 404 status.
+    "not_found_handling": "404-page",
+  },
+  // Serves the site at https://indigitousph.<your-subdomain>.workers.dev.
+  // To use a custom domain, add "routes": [{ "pattern": "example.org", "custom_domain": true }]
+  // and set SITE_URL to match when building.
+  "workers_dev": true,
+  "preview_urls": true,
+}
