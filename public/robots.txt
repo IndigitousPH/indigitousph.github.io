@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /storybook
-
-Sitemap: https://indigitousph.github.io/sitemap-index.xml

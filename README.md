@@ -4,7 +4,7 @@ The website of **Indigitous Philippines**, a movement of Filipino believers usin
 
 _Locally rooted. Digitally sent._
 
-Built with [Astro](https://astro.build) and [Tailwind CSS](https://tailwindcss.com) and deployed to GitHub Pages.
+Built with [Astro](https://astro.build) and [Tailwind CSS](https://tailwindcss.com) and deployed to GitHub Pages. It can also be served from Cloudflare Workers (`pnpm deploy:cf`; see the Deploy section of AGENTS.md).
 
 ## Quick start
 

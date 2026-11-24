@@ -1,0 +1,42 @@
+name: Deploy to Cloudflare Workers
+
+# Optional second host. Runs only when the repository variable CLOUDFLARE_ACCOUNT_ID is set,
+# plus a CLOUDFLARE_API_TOKEN secret (template: "Edit Cloudflare Workers").
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # Daily rebuild at 00:05 Manila time (16:05 UTC) so ended events and announcements drop off.
+  schedule:
+    - cron: '5 16 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: vars.CLOUDFLARE_ACCOUNT_ID != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+        env:
+          SITE_URL: ${{ vars.CLOUDFLARE_SITE_URL }}
+          PUBLIC_FORM_ENDPOINT: ${{ vars.PUBLIC_FORM_ENDPOINT }}
+          PUBLIC_PRAYER_ENDPOINT: ${{ vars.PUBLIC_PRAYER_ENDPOINT }}
+          PUBLIC_NEWSLETTER_ENDPOINT: ${{ vars.PUBLIC_NEWSLETTER_ENDPOINT }}
+      - uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          packageManager: pnpm
