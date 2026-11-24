@@ -200,8 +200,9 @@ The Indigitous global palette and fonts (from indigitous.org and the #HACK Brand
 
 The same `dist/` can also be served by **Cloudflare Workers** as static assets (no Worker script, no adapter). `wrangler.jsonc` points at `dist/`:
 
-- `.github/workflows/deploy-cloudflare.yml` deploys on every push to `main` and daily, like the Pages workflow. It stays off until you set the repository variable `CLOUDFLARE_ACCOUNT_ID` and the secret `CLOUDFLARE_API_TOKEN` (token template "Edit Cloudflare Workers").
-- Set the variable `CLOUDFLARE_SITE_URL` (e.g. your custom domain) so canonical links, the sitemap and `robots.txt` point at the Workers host. The build reads it as `SITE_URL`; unset, it falls back to the GitHub Pages URL.
+- The Worker is called `indigitous` and is connected to this repo through Cloudflare's Git integration (Workers Builds). Build command `pnpm run build`, deploy command `npx wrangler deploy`. The `name` in `wrangler.jsonc` must match the Worker's name in the dashboard.
+- Workers Builds deploys on push but does not rebuild daily, so events and announcements can linger until the next push. `.github/workflows/deploy-cloudflare.yml` covers that: it deploys on every push to `main` and daily, like the Pages workflow. It stays off until you set the repository variable `CLOUDFLARE_ACCOUNT_ID` and the secret `CLOUDFLARE_API_TOKEN` (token template "Edit Cloudflare Workers").
+- Set the variable `CLOUDFLARE_SITE_URL` (e.g. your custom domain) so canonical links, the sitemap and `robots.txt` point at the Workers host. The build reads it as `SITE_URL`; unset, it falls back to the GitHub Pages URL. For Workers Builds, set `SITE_URL` as a build variable in the Worker's settings.
 - Old URLs get real 301s on Workers: the build writes `dist/_redirects` from `redirects` in `astro.config.mjs`. Cache and security headers live in `public/_headers`. GitHub Pages ignores both files.
 - For a custom domain, add a `routes` entry in `wrangler.jsonc` (see the comment there).
 
